@@ -595,10 +595,10 @@ PlayerSettings:
   metroPackageName: ARSpicyBread
   metroPackageVersion: 1.0.0.0
   metroCertificatePath: Assets/WSATestCertificate.pfx
-  metroCertificatePassword: Mvi~xu=>?
-  metroCertificateSubject: ARSpicyBread
-  metroCertificateIssuer: ARSpicyBread
-  metroCertificateNotAfter: 00b05d440a3bd501
+  metroCertificatePassword: 
+  metroCertificateSubject: DefaultCompany
+  metroCertificateIssuer: DefaultCompany
+  metroCertificateNotAfter: 8099b906203ed501
   metroApplicationDescription: ar-spicybread
   wsaImages: {}
   metroTileShortName: 
@@ -626,7 +626,7 @@ PlayerSettings:
       InternetClient: False
       InternetClientServer: False
       Location: True
-      Microphone: False
+      Microphone: True
       MusicLibrary: False
       Objects3D: True
       PhoneCall: False

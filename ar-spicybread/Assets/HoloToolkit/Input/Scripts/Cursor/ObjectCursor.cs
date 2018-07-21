@@ -12,6 +12,8 @@ namespace HoloToolkit.Unity.InputModule
     /// </summary>
     public class ObjectCursor : Cursor
     {
+        private MeshRenderer meshRenderer;
+
         [Serializable]
         public struct ObjectCursorDatum
         {
@@ -23,6 +25,12 @@ namespace HoloToolkit.Unity.InputModule
         [SerializeField]
         public ObjectCursorDatum[] CursorStateData;
 
+        void OnStart()
+        {
+            meshRenderer = this.gameObject.GetComponentInChildren<MeshRenderer>();
+            meshRenderer.enabled = true;
+        }
+
         /// <summary>
         /// Sprite renderer to change.  If null find one in children
         /// </summary>
@@ -33,7 +41,7 @@ namespace HoloToolkit.Unity.InputModule
         /// </summary>
         protected override void OnEnable()
         {
-            if(ParentTransform == null)
+            if (ParentTransform == null)
             {
                 ParentTransform = transform;
             }
@@ -52,7 +60,7 @@ namespace HoloToolkit.Unity.InputModule
             if (state != CursorStateEnum.Contextual)
             {
                 // Hide all children first
-                for(int i = 0; i < ParentTransform.childCount; i++)
+                for (int i = 0; i < ParentTransform.childCount; i++)
                 {
                     ParentTransform.GetChild(i).gameObject.SetActive(false);
                 }
@@ -65,6 +73,26 @@ namespace HoloToolkit.Unity.InputModule
                         CursorStateData[i].CursorObject.SetActive(true);
                     }
                 }
+            }
+        }
+
+        void Update()
+        {
+            // Do a raycast into the world based on the user's
+            // head position and orientation.
+            var headPosition = Camera.main.transform.position;
+            var gazeDirection = Camera.main.transform.forward;
+
+            RaycastHit hitInfo;
+
+            if (Physics.Raycast(headPosition, gazeDirection, out hitInfo))
+            {
+
+                // Move thecursor to the point where the raycast hit.
+                this.transform.position = hitInfo.point;
+
+                // Rotate the cursor to hug the surface of the hologram.
+                this.transform.rotation = Quaternion.FromToRotation(Vector3.up, hitInfo.normal);
             }
         }
     }
