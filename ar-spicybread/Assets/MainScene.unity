@@ -327,6 +327,8 @@ GameObject:
   m_Component:
   - component: {fileID: 223222300}
   - component: {fileID: 223222303}
+  - component: {fileID: 223222301}
+  - component: {fileID: 223222302}
   m_Layer: 0
   m_Name: SpiceCollection
   m_TagString: Untagged
@@ -352,6 +354,28 @@ Transform:
   m_Father: {fileID: 1412786879}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &223222301
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 223222299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24b0e23534e9f8d4eb58d25cc7b79cab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &223222302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 223222299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 429c23152576af64a81c03b2c068d0aa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &223222303
 MonoBehaviour:
   m_ObjectHideFlags: 0

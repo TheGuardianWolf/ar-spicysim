@@ -22,7 +22,7 @@ public class GazeGestureManager : MonoBehaviour
             // Send an OnSelect message to the focused object and its children.
             if (FocusedObject != null)
             {
-                if (FocusedObject.name.Contains("ResistorComponent") || FocusedObject.name.Contains("BatteryComponent"))
+                if (FocusedObject.name.Contains("ResistorComponent") || FocusedObject.name.Contains("BatteryComponent") || FocusedObject.name.Contains("Node"))
                 {
                     FocusedObject.SendMessage("OnSelect", SendMessageOptions.DontRequireReceiver);
                 }

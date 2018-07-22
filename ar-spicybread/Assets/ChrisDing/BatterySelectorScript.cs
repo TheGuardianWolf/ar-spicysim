@@ -6,6 +6,7 @@ public class BatterySelectorScript : MonoBehaviour
 {
     public GameObject cursor;
     public GameObject batteryPrefab;
+    GraphManager graph;
     TapToPlaceParent SpiceCollectionScript;
 
     // Use this for initialization
@@ -13,6 +14,7 @@ public class BatterySelectorScript : MonoBehaviour
     {
         Transform SpiceCollection = this.transform.parent.transform;
         SpiceCollectionScript = SpiceCollection.GetComponentInChildren<TapToPlaceParent>();
+        graph = SpiceCollection.GetComponentInChildren<GraphManager>();
     }
 
     void OnSelect()
@@ -29,7 +31,8 @@ public class BatterySelectorScript : MonoBehaviour
     private GameObject createNewBattery()
     {
         GameObject newResistor = Instantiate(batteryPrefab) as GameObject;
-        newResistor.transform.parent = this.gameObject.transform.parent.transform;
+        graph.addVertexToGraph(newResistor);
+        newResistor.transform.parent = gameObject.transform.parent.transform;
         return newResistor;
     }
 }

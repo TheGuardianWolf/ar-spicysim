@@ -8,8 +8,10 @@ public class TapToPlaceParent : MonoBehaviour
     private bool wiring = false;
     private bool firstWiringSelected = false;
     private GameObject firstWiringComponent;
-    private Quaternion firstWiringComponentInitialRotation;
+    private Vector3 firstWiringComponentInitialScale;
     private bool ComponentPlacingMutex; //true is being used, false is not
+    float scalingFactor = 1.2f;
+    bool scaleIncrease = true;
 
     private void Start()
     {
@@ -72,13 +74,13 @@ public class TapToPlaceParent : MonoBehaviour
     public void setFirstWiringSelected(GameObject go)
     {
         firstWiringComponent = go;
-        firstWiringComponentInitialRotation = firstWiringComponent.transform.rotation;
+        firstWiringComponentInitialScale = firstWiringComponent.transform.localScale;
         firstWiringSelected = true;
     }
 
     public void clearFirstWiringSelected()
     {
-        firstWiringComponent.transform.rotation = firstWiringComponentInitialRotation;
+        firstWiringComponent.transform.localScale = firstWiringComponentInitialScale;
         firstWiringComponent = null;
         firstWiringSelected = false;
     }
@@ -136,7 +138,26 @@ public class TapToPlaceParent : MonoBehaviour
 
         if (firstWiringSelected)
         {
-            firstWiringComponent.transform.Rotate(new Vector3(0, 30, 0) * Time.deltaTime);
+            if (firstWiringComponent.transform.localScale.x >= firstWiringComponentInitialScale.x * 2.0f || firstWiringComponent.transform.localScale.x <= firstWiringComponentInitialScale.x)
+            {
+                scaleIncrease = !scaleIncrease;
+            }
+
+            if (scaleIncrease)
+            {
+                firstWiringComponent.transform.localScale = new Vector3(firstWiringComponent.transform.localScale.x + firstWiringComponent.transform.localScale.x * scalingFactor * Time.deltaTime, firstWiringComponent.transform.localScale.y 
+                    + firstWiringComponent.transform.localScale.y * scalingFactor * Time.deltaTime, firstWiringComponent.transform.localScale.z + firstWiringComponent.transform.localScale.z * scalingFactor * Time.deltaTime);
+            }
+            else
+            {
+                firstWiringComponent.transform.localScale = new Vector3(firstWiringComponent.transform.localScale.x - firstWiringComponent.transform.localScale.x * scalingFactor * Time.deltaTime, firstWiringComponent.transform.localScale.y 
+                    - firstWiringComponent.transform.localScale.y * scalingFactor * Time.deltaTime, firstWiringComponent.transform.localScale.z - firstWiringComponent.transform.localScale.z * scalingFactor * Time.deltaTime);
+            }
         }
+        else
+        {
+            scaleIncrease = true;
+        }
+
     }
 }
