@@ -57,6 +57,11 @@ namespace ConsoleApp1
             return GetVertexById(GetIdByInstanceID(o));
         }
 
+        public void RemoveByInstanceID(int o)
+        {
+            content.Remove(GetVertexById(GetIdByInstanceID(o)));
+        }
+
         public int GetCurrent()
         {
             return currentVertex;

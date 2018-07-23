@@ -45,15 +45,18 @@ public class NodeScript : MonoBehaviour {
                     this.attachedNodeID = newNode;
                     SpiceCollectionScript.getFirstWiringComponent().GetComponentInChildren<NodeScript>().attachedNodeID = newNode;
 
+                    Debug.Log("Clear 1");
                     SpiceCollectionScript.clearFirstWiringSelected();
                 }
                 else
                 {
+                    Debug.Log("Clear 2");
                     SpiceCollectionScript.clearFirstWiringSelected();
                 }
             }
             else
             {
+                Debug.Log("Set");
                 SpiceCollectionScript.setFirstWiringSelected(gameObject);
             }
         }

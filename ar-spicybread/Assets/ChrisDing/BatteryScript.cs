@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using ConsoleApp1;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,6 +7,7 @@ public class BatteryScript : MonoBehaviour
 {
     private bool placing;
     TapToPlaceParent SpiceCollectionScript;
+    Graph graph;
 
     // Use this for initialization
     void Start()
@@ -15,6 +17,7 @@ public class BatteryScript : MonoBehaviour
         transform.rotation = SpiceCollection.rotation;
         SpiceCollectionScript = SpiceCollection.GetComponentInChildren<TapToPlaceParent>();
         SpiceCollectionScript.getPlacingMutex();
+        SpiceCollection.gameObject.GetComponentInChildren<GraphManager>().getGraph();
     }
 
     private void OnSelect()
@@ -61,6 +64,7 @@ public class BatteryScript : MonoBehaviour
         if (collision.gameObject.name.Contains("Recycling"))
         {
             SpiceCollectionScript.returnPlacingMutex();
+            graph.RemoveByInstanceID(gameObject.GetInstanceID());
             Destroy(gameObject);
         }
     }

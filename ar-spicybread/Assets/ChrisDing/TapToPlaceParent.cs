@@ -10,7 +10,7 @@ public class TapToPlaceParent : MonoBehaviour
     private GameObject firstWiringComponent;
     private Vector3 firstWiringComponentInitialScale;
     private bool ComponentPlacingMutex; //true is being used, false is not
-    float scalingFactor = 1.2f;
+    float scalingFactor = 1.3f;
     bool scaleIncrease = true;
 
     private void Start()
@@ -80,8 +80,11 @@ public class TapToPlaceParent : MonoBehaviour
 
     public void clearFirstWiringSelected()
     {
-        firstWiringComponent.transform.localScale = firstWiringComponentInitialScale;
-        firstWiringComponent = null;
+        if (firstWiringComponent != null)
+        {
+            firstWiringComponent.transform.localScale = firstWiringComponentInitialScale;
+            firstWiringComponent = null;
+        }
         firstWiringSelected = false;
     }
 
@@ -138,7 +141,7 @@ public class TapToPlaceParent : MonoBehaviour
 
         if (firstWiringSelected)
         {
-            if (firstWiringComponent.transform.localScale.x >= firstWiringComponentInitialScale.x * 2.0f || firstWiringComponent.transform.localScale.x <= firstWiringComponentInitialScale.x)
+            if (firstWiringComponent.transform.localScale.x > firstWiringComponentInitialScale.x * 2.0f || firstWiringComponent.transform.localScale.x < firstWiringComponentInitialScale.x)
             {
                 scaleIncrease = !scaleIncrease;
             }
