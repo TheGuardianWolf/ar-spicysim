@@ -1,16 +1,11 @@
 ﻿
 using ConsoleApp1;
 using UnityEngine;
-using System;
-
-#if UNITY_WSA && !UNITY_EDITOR
 using SpiceSharp.Components;
 using SpiceSharp.Simulations;
 using SpiceSharp;
-#endif
 
 public class SimulationScript : MonoBehaviour {
-#if UNITY_WSA && !UNITY_EDITOR
     Circuit ckt;
     Graph graph;
     DC dc;
@@ -99,5 +94,4 @@ public class SimulationScript : MonoBehaviour {
             }
         }
     }
-#endif
 }
