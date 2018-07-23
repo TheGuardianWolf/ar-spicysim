@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ResistorScript : MonoBehaviour {
 
@@ -9,8 +10,10 @@ public class ResistorScript : MonoBehaviour {
     TapToPlaceParent SpiceCollectionScript;
     Graph graph;
     NodeManager nodes;
-	// Use this for initialization
-	void Start () {
+    Text valueText;
+    public Text text;
+    // Use this for initialization
+    void Start () {
         Vector3 scale = new Vector3(0.017375f, 0.1f, 0.019125f);
         placing = true;
         Transform SpiceCollection = this.transform.parent.transform;
@@ -63,7 +66,21 @@ public class ResistorScript : MonoBehaviour {
         }
     }
 
-    void OnTriggerEnter(Collider collision)
+    public void changeText(string textToChange)
+    {
+        if (valueText == null)
+        {
+            valueText = Instantiate(text) as Text;
+            valueText.color = Color.green;
+            valueText.fontSize = 26;
+            //place text on top of resistor and face towards camera
+            valueText.rectTransform.SetPositionAndRotation(new Vector3(this.gameObject.transform.position.x, this.gameObject.transform.position.y + 0.04f, this.gameObject.transform.position.z), Quaternion.LookRotation(Camera.main.transform.forward, Camera.main.transform.up));
+            valueText.alignment = TextAnchor.LowerCenter;
+        }
+    }
+
+
+        void OnTriggerEnter(Collider collision)
     {
         if (collision.gameObject.name.Contains("Recycling"))
         {

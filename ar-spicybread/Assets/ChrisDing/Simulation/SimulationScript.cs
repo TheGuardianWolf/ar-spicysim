@@ -37,8 +37,18 @@ public class SimulationScript : MonoBehaviour {
                 }
             }
         };
-        ckt.Validate();
-        dc.Run(ckt);
+        try
+        {
+            ckt.Validate();
+        }
+        catch (CircuitException ce)
+        {
+        }
+        finally
+        {
+            dc.Run(ckt);
+        }
+
     }
 
     void AddComponents()
@@ -65,9 +75,11 @@ public class SimulationScript : MonoBehaviour {
                         node2 = child.gameObject.GetComponentInChildren<NodeScript>().attachedNodeID.ToString();
                     }
                 }
-                
-                ckt.Objects.Add(new Resistor("R" + graph.Contents[i].Name, node1, node2, value));
-                Debug.Log("R" + graph.Contents[i].Name + " Node1: " + node1 + " Node2: "  + node2);
+
+                if (value > 0.0)
+                {
+                    ckt.Objects.Add(new Resistor("R" + graph.Contents[i].Name, node1, node2, value));
+                }
             }
             else if (graph.Contents[i].Value.name.Contains("BatteryComponent"))
             {
@@ -90,7 +102,6 @@ public class SimulationScript : MonoBehaviour {
                 {
                     ckt.Objects.Add(new VoltageSource("V" + graph.Contents[i].Name, node1, node2, value));
                     dc = new DC("DC sim", "V" + graph.Contents[i].Name, value - 1, value, 1.0);
-                    Debug.Log("V" + graph.Contents[i].Name + " Node1: " + node1 + " Node2: " + node2);
                 }
             }
         }

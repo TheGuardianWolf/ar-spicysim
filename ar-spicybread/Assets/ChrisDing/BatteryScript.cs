@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BatteryScript : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public class BatteryScript : MonoBehaviour
     TapToPlaceParent SpiceCollectionScript;
     Graph graph;
     NodeManager nodes;
+    Text valueText;
+    public Text text;
 
     // Use this for initialization
     void Start()
@@ -45,7 +48,6 @@ public class BatteryScript : MonoBehaviour
 
     private void Update()
     {
-
         if (placing)
         {
             var headPosition = Camera.main.transform.position;
@@ -61,7 +63,21 @@ public class BatteryScript : MonoBehaviour
         }
     }
 
-    void OnTriggerEnter(Collider collision)
+    public void changeText(string textToChange)
+    {
+        if (valueText == null)
+        {
+            valueText = Instantiate(text) as Text;
+            valueText.color = Color.green;
+            valueText.fontSize = 26;
+            //place text on top of resistor and face towards camera
+            valueText.rectTransform.SetPositionAndRotation(new Vector3(this.gameObject.transform.position.x, this.gameObject.transform.position.y + 0.04f, this.gameObject.transform.position.z), Quaternion.LookRotation(Camera.main.transform.forward, Camera.main.transform.up));
+            valueText.alignment = TextAnchor.LowerCenter;
+        }
+    }
+
+
+        void OnTriggerEnter(Collider collision)
     {
         if (collision.gameObject.name.Contains("Recycling"))
         {
