@@ -1,11 +1,15 @@
-﻿using SpiceSharp.Components;
-using SpiceSharp.Simulations;
-using SpiceSharp;
+﻿
 using ConsoleApp1;
 using UnityEngine;
 
-public class SimulationScript : MonoBehaviour {
+#if UNITY_WSA && !UNITY_EDITOR
+using SpiceSharp.Components;
+using SpiceSharp.Simulations;
+using SpiceSharp;
+#endif
 
+public class SimulationScript : MonoBehaviour {
+#if UNITY_WSA && !UNITY_EDITOR
     Circuit ckt;
     Graph graph;
     DC dc;
@@ -84,9 +88,10 @@ public class SimulationScript : MonoBehaviour {
                 if (value > 0.0)
                 {
                     ckt.Objects.Add(new VoltageSource("V" + graph.Contents[i].Name, node2, node1, value));
-                    dc = new DC("DC sim", "V" + graph.Contents[i].Name, value, value, 0.0);
+                    dc = new DC("DC sim", "V" + graph.Contents[i].Name, value, value + 1, 1.0);
                 }
             }
         }
     }
+#endif
 }
