@@ -1,6 +1,7 @@
 ﻿
 using ConsoleApp1;
 using UnityEngine;
+using System;
 
 #if UNITY_WSA && !UNITY_EDITOR
 using SpiceSharp.Components;
@@ -18,7 +19,7 @@ public class SimulationScript : MonoBehaviour {
     void Start () {
         ckt = new Circuit();
         graph = this.gameObject.GetComponentInChildren<GraphManager>().getGraph();
-	}
+    }
 
     void onSimulate()
     {
@@ -31,13 +32,16 @@ public class SimulationScript : MonoBehaviour {
                 {
                     if (child.gameObject.name.Contains("Node"))
                     {
-                        double voltageAtNode = args.GetVoltage(child.gameObject.GetComponentInChildren<NodeScript>().attachedNodeID.ToString());
-                        //   output = (double)decimal.Round((decimal)output, 2, MidpointRounding.AwayFromZero);
-                        child.gameObject.GetComponentInChildren<NodeScript>().changeText(voltageAtNode.ToString());
+                        if (child.gameObject.GetComponentInChildren<NodeScript>().attachedNodeID != 0)
+                        {
+                            double voltageAtNode = args.GetVoltage(child.gameObject.GetComponentInChildren<NodeScript>().attachedNodeID.ToString());
+                            child.gameObject.GetComponentInChildren<NodeScript>().changeText(Math.Round(voltageAtNode, 2).ToString());
+                        }
                     }
                 }
             }
         };
+        ckt.Validate();
         dc.Run(ckt);
     }
 
@@ -67,6 +71,7 @@ public class SimulationScript : MonoBehaviour {
                 }
                 
                 ckt.Objects.Add(new Resistor("R" + graph.Contents[i].Name, node1, node2, value));
+                Debug.Log("R" + graph.Contents[i].Name + " Node1: " + node1 + " Node2: "  + node2);
             }
             else if (graph.Contents[i].Value.name.Contains("BatteryComponent"))
             {
@@ -87,8 +92,9 @@ public class SimulationScript : MonoBehaviour {
 
                 if (value > 0.0)
                 {
-                    ckt.Objects.Add(new VoltageSource("V" + graph.Contents[i].Name, node2, node1, value));
-                    dc = new DC("DC sim", "V" + graph.Contents[i].Name, value, value + 1, 1.0);
+                    ckt.Objects.Add(new VoltageSource("V" + graph.Contents[i].Name, node1, node2, value));
+                    dc = new DC("DC sim", "V" + graph.Contents[i].Name, value - 1, value, 1.0);
+                    Debug.Log("V" + graph.Contents[i].Name + " Node1: " + node1 + " Node2: " + node2);
                 }
             }
         }

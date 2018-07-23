@@ -8,6 +8,7 @@ public class BatteryScript : MonoBehaviour
     private bool placing;
     TapToPlaceParent SpiceCollectionScript;
     Graph graph;
+    NodeManager nodes;
 
     // Use this for initialization
     void Start()
@@ -17,7 +18,8 @@ public class BatteryScript : MonoBehaviour
         transform.rotation = SpiceCollection.rotation;
         SpiceCollectionScript = SpiceCollection.GetComponentInChildren<TapToPlaceParent>();
         SpiceCollectionScript.getPlacingMutex();
-        SpiceCollection.gameObject.GetComponentInChildren<GraphManager>().getGraph();
+        graph = SpiceCollection.gameObject.GetComponentInChildren<GraphManager>().getGraph();
+        nodes = SpiceCollection.gameObject.GetComponentInChildren<NodeManager>();
     }
 
     private void OnSelect()
@@ -65,6 +67,14 @@ public class BatteryScript : MonoBehaviour
         {
             SpiceCollectionScript.returnPlacingMutex();
             graph.RemoveByInstanceID(gameObject.GetInstanceID());
+
+            foreach (Transform child in transform)
+            {
+                if (child.gameObject.name.Contains("LeftNode") || child.gameObject.name.Contains("RightNode"))
+                {
+                    nodes.removeNode(child.gameObject);
+                }
+            }
             Destroy(gameObject);
         }
     }

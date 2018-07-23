@@ -12,6 +12,7 @@ public class GraphManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         currentID = 0;
+        currentNodeID = 1;
         circuitGraph = new Graph();
 	}
 

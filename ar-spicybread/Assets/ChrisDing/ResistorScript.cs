@@ -8,6 +8,7 @@ public class ResistorScript : MonoBehaviour {
     private bool placing;
     TapToPlaceParent SpiceCollectionScript;
     Graph graph;
+    NodeManager nodes;
 	// Use this for initialization
 	void Start () {
         Vector3 scale = new Vector3(0.017375f, 0.1f, 0.019125f);
@@ -16,7 +17,8 @@ public class ResistorScript : MonoBehaviour {
         transform.rotation = SpiceCollection.rotation;
         SpiceCollectionScript = SpiceCollection.GetComponentInChildren<TapToPlaceParent>();
         SpiceCollectionScript.getPlacingMutex();
-        SpiceCollection.gameObject.GetComponentInChildren<GraphManager>().getGraph();
+        graph = SpiceCollection.gameObject.GetComponentInChildren<GraphManager>().getGraph();
+        nodes = SpiceCollection.gameObject.GetComponentInChildren<NodeManager>();
 
         //Vector3 rightEnd = new Vector3((transform.position + 0.040f * transform.right).x - 0.005f, (transform.position + 0.040f * transform.right).y + 0.012f, (transform.position + 0.040f * transform.right).z + 0.001f);
         //createWire(rightEnd, rightEnd + new Vector3(rightEnd.x + 0.02f, rightEnd.y, rightEnd.z), lineMaterial, this.transform);
@@ -67,6 +69,13 @@ public class ResistorScript : MonoBehaviour {
         {
             SpiceCollectionScript.returnPlacingMutex();
             graph.RemoveByInstanceID(gameObject.GetInstanceID());
+            foreach (Transform child in transform)
+            {
+                if (child.gameObject.name.Contains("LeftNode") || child.gameObject.name.Contains("RightNode"))
+                {
+                    nodes.removeNode(child.gameObject);
+                }
+            }
             Destroy(gameObject);
         }
     }

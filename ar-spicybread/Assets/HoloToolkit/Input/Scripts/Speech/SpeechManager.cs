@@ -39,6 +39,12 @@ public class SpeechManager : MonoBehaviour
             this.BroadcastMessage("onNode");
             });
 
+            keywords.Add("Ground", () =>
+            {
+                // Call the OnReset method on every descendant object.
+                this.BroadcastMessage("onGround");
+            });
+
             keywords.Add("Simulate", () =>
             {
                 // Call the OnReset method on every descendant object.

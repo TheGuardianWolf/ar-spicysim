@@ -8,6 +8,7 @@ public class ResistorSelectorScript : MonoBehaviour {
     public GameObject cursor;
     public GameObject resistorPrefab;
     GraphManager graph;
+    NodeManager nodes;
     TapToPlaceParent SpiceCollectionScript;
 
 	// Use this for initialization

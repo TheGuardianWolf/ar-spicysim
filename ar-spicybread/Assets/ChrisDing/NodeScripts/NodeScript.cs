@@ -12,11 +12,46 @@ public class NodeScript : MonoBehaviour {
     Transform SpiceCollection;
     Text valueText;
     public Text text;
+    NodeManager nodes;
     // Use this for initialization
     void Start () {
         SpiceCollection = transform.parent.transform.parent.transform;
         SpiceCollectionScript = SpiceCollection.GetComponentInChildren<TapToPlaceParent>();
         graph = SpiceCollection.GetComponentInChildren<GraphManager>();
+        nodes = SpiceCollection.GetComponentInChildren<NodeManager>();
+        nodes.addNode(gameObject);
+        attachedNodeID = graph.getNewNodeID();
+    }
+
+    void onGround()
+    {
+        if (SpiceCollectionScript.getFirstWiringComponent() != null && SpiceCollectionScript.getFirstWiringComponent() == gameObject)
+        {
+            int newNode = graph.getNewNodeID();
+
+            // clear old ground
+            foreach (GameObject node in nodes.getNodes())
+            {
+                if (node.GetComponentInChildren<NodeScript>().attachedNodeID == 0)
+                {
+                    node.GetComponentInChildren<NodeScript>().changeAttachedNodeID(newNode);
+                }
+            }
+
+            //add new ground
+            foreach (GameObject node in nodes.getNodes())
+            {
+                NodeScript nodeScript = node.GetComponentInChildren<NodeScript>();
+                if (nodeScript.attachedNodeID == attachedNodeID && node != gameObject)
+                {
+                    nodeScript.changeAttachedNodeID(0);
+                    nodeScript.changeText("GND");
+                }
+            }
+
+            changeAttachedNodeID(0);
+            changeText("GND");
+        }
     }
 
     void OnSelect()
@@ -32,18 +67,20 @@ public class NodeScript : MonoBehaviour {
                     //same node for both gameobjects
                     int newNode = graph.getNewNodeID();
 
-                    //interatively turn all nodes into same node
-                    //Transform[] allChildren = SpiceCollection.GetComponentsInChildren<Transform>();
-                    //foreach (Transform child in allChildren)
-                    //{
-                    //    if (child.gameObject.GetComponentInChildren<NodeScript>().attachedNodeID == this.attachedNodeID || child.gameObject.GetComponentInChildren<NodeScript>().attachedNodeID == SpiceCollectionScript.getFirstWiringComponent().GetComponentInChildren<NodeScript>().attachedNodeID)
-                    //    {
-                    //        child.gameObject.GetComponentInChildren<NodeScript>().attachedNodeID = newNode;
-                    //    }
-                    //}
+                    //iteratively turn all nodes into same node
+                    foreach (GameObject node in nodes.getNodes())
+                    {
+                        if (node.GetComponentInChildren<NodeScript>().attachedNodeID == this.attachedNodeID || node.GetComponentInChildren<NodeScript>().attachedNodeID == SpiceCollectionScript.getFirstWiringComponent().GetComponentInChildren<NodeScript>().attachedNodeID)
+                        {
+                            if (node != gameObject && node != SpiceCollectionScript.getFirstWiringComponent())
+                            {
+                                node.GetComponentInChildren<NodeScript>().changeAttachedNodeID(newNode);
+                            }
+                        }
+                    }
 
-                    this.attachedNodeID = newNode;
-                    SpiceCollectionScript.getFirstWiringComponent().GetComponentInChildren<NodeScript>().attachedNodeID = newNode;
+                    changeAttachedNodeID(newNode);
+                    SpiceCollectionScript.getFirstWiringComponent().GetComponentInChildren<NodeScript>().changeAttachedNodeID(newNode);
 
                     Debug.Log("Clear 1");
                     SpiceCollectionScript.clearFirstWiringSelected();
@@ -72,6 +109,7 @@ public class NodeScript : MonoBehaviour {
             //place text on top of resistor and face towards camera
             valueText.rectTransform.SetPositionAndRotation(new Vector3(this.gameObject.transform.position.x, this.gameObject.transform.position.y + 0.04f, this.gameObject.transform.position.z), Quaternion.LookRotation(Camera.main.transform.forward, Camera.main.transform.up));
             valueText.alignment = TextAnchor.LowerCenter;
+            valueText.transform.parent = this.transform;
         }
         valueText.text = textToChange;
     }
@@ -103,5 +141,11 @@ public class NodeScript : MonoBehaviour {
         {
             valueText.rectTransform.SetPositionAndRotation(new Vector3(this.transform.position.x, this.transform.position.y + 0.08f, this.transform.position.z), Quaternion.LookRotation(Camera.main.transform.forward, Camera.main.transform.up));
         }
+    }
+
+    public void changeAttachedNodeID(int n)
+    {
+        this.attachedNodeID = n;
+        changeText(n.ToString());
     }
 }
