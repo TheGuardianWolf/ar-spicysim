@@ -4,6 +4,7 @@ using UnityEngine;
 using SpiceSharp.Components;
 using SpiceSharp.Simulations;
 using SpiceSharp;
+using System;
 
 public class SimulationScript : MonoBehaviour {
     Circuit ckt;

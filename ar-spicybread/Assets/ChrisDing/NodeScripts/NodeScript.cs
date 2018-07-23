@@ -109,7 +109,6 @@ public class NodeScript : MonoBehaviour {
             //place text on top of resistor and face towards camera
             valueText.rectTransform.SetPositionAndRotation(new Vector3(this.gameObject.transform.position.x, this.gameObject.transform.position.y + 0.04f, this.gameObject.transform.position.z), Quaternion.LookRotation(Camera.main.transform.forward, Camera.main.transform.up));
             valueText.alignment = TextAnchor.LowerCenter;
-            valueText.transform.parent = this.transform;
         }
         valueText.text = textToChange;
     }
@@ -146,6 +145,13 @@ public class NodeScript : MonoBehaviour {
     public void changeAttachedNodeID(int n)
     {
         this.attachedNodeID = n;
-        changeText(n.ToString());
+        
+        //debug purposes
+        //changeText(n.ToString());
+    }
+
+    void OnDestroy()
+    {
+        Destroy(valueText.gameObject);
     }
 }
