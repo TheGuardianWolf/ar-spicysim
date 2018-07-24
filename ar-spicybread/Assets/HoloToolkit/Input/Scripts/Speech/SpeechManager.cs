@@ -33,12 +33,6 @@ public class SpeechManager : MonoBehaviour
     {
         if (keywords.Count == 0)
         {
-            keywords.Add("Node", () =>
-            {
-            // Call the OnReset method on every descendant object.
-            this.BroadcastMessage("onNode");
-            });
-
             keywords.Add("Ground", () =>
             {
                 // Call the OnReset method on every descendant object.
@@ -92,6 +86,67 @@ public class SpeechManager : MonoBehaviour
                 // Call the OnReset method on every descendant object.
                 this.BroadcastMessage("onRotate");
             });
+
+            keywords.Add("Zero", () =>
+            {
+                // Call the OnReset method on every descendant object.
+                this.BroadcastMessage("button0Listener");
+            });
+
+            keywords.Add("One", () =>
+            {
+                // Call the OnReset method on every descendant object.
+                this.BroadcastMessage("button1Listener");
+            });
+
+            keywords.Add("Two", () =>
+            {
+                // Call the OnReset method on every descendant object.
+                this.BroadcastMessage("button2Listener");
+            });
+
+            keywords.Add("Three", () =>
+            {
+                // Call the OnReset method on every descendant object.
+                this.BroadcastMessage("button3Listener");
+            });
+
+            keywords.Add("Four", () =>
+            {
+                // Call the OnReset method on every descendant object.
+                this.BroadcastMessage("button4Listener");
+            });
+
+            keywords.Add("Five", () =>
+            {
+                // Call the OnReset method on every descendant object.
+                this.BroadcastMessage("button5Listener");
+            });
+
+            keywords.Add("Six", () =>
+            {
+                // Call the OnReset method on every descendant object.
+                this.BroadcastMessage("button6Listener");
+            });
+
+            keywords.Add("Seven", () =>
+            {
+                // Call the OnReset method on every descendant object.
+                this.BroadcastMessage("button7Listener");
+            });
+
+            keywords.Add("Eight", () =>
+            {
+                // Call the OnReset method on every descendant object.
+                this.BroadcastMessage("button8Listener");
+            });
+
+            keywords.Add("Nine", () =>
+            {
+                // Call the OnReset method on every descendant object.
+                this.BroadcastMessage("button9Listener");
+            });
+
 
             // Tell the KeywordRecognizer about our keywords.
             keywordRecognizer = new KeywordRecognizer(keywords.Keys.ToArray());

@@ -4,8 +4,10 @@ public class TapToPlaceParent : MonoBehaviour
 {
     public GameObject cursor;
     public GameObject cursorVisual;
+    public GameObject canvas;
     private bool placing = true;
     private bool wiring = false;
+    private bool valuePlacement = false;
     private bool firstWiringSelected = false;
     private GameObject firstWiringComponent;
     private Vector3 firstWiringComponentInitialScale;
@@ -33,9 +35,10 @@ public class TapToPlaceParent : MonoBehaviour
         }
     }
 
+    //Placing
     public bool getPlacingMutex()
     {
-        if (!ComponentPlacingMutex)
+        if (!ComponentPlacingMutex && !valuePlacement)
         {
             ComponentPlacingMutex = true;
             return true;
@@ -51,9 +54,13 @@ public class TapToPlaceParent : MonoBehaviour
         ComponentPlacingMutex = false;
     }
 
+    //Wiring
     public void setWiring()
     {
-        wiring = true;
+        if (!valuePlacement)
+        {
+            wiring = true;
+        }
     }
 
     public void clearWiring()
@@ -91,6 +98,28 @@ public class TapToPlaceParent : MonoBehaviour
     public GameObject getFirstWiringComponent()
     {
         return firstWiringComponent;
+    }
+
+    //value Placement
+    public bool setValuePlacement()
+    {
+        if (!ComponentPlacingMutex)
+        {
+            valuePlacement = true;
+            return true;
+        }
+
+        return false;
+    }
+
+    public void clearValuePlacement()
+    {
+        valuePlacement = false;
+    }
+
+    public bool getValuePlacement()
+    {
+        return valuePlacement;
     }
 
     // Update is called once per frame

@@ -19,6 +19,12 @@ public class BaseButtonControl : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        //this.transform.position = Camera.main.transform.position + new Vector3(Camera.main.transform.forward.x , 0.0f, Camera.main.transform.forward.z * 3.0f);
+
+        //Vector3 desired_normal_y = transform.position - Camera.main.transform.position;
+        //transform.rotation = Quaternion.LookRotation(Camera.main.transform.forward, Camera.main.transform.up);
+
+        //this.transform.position = new Vector3(Camera.main.transform.position.x, Camera.main.transform.position.y, Camera.main.transform.position.z + 2.5f);
         button0.onClick.AddListener(button0Listener);
         button1.onClick.AddListener(button1Listener);
         button2.onClick.AddListener(button2Listener);
@@ -35,60 +41,60 @@ public class BaseButtonControl : MonoBehaviour {
     {
         value = 0;
         this.transform.root.BroadcastMessage("baseValue", value);
-        Destroy(this.gameObject.transform.parent.transform.parent.gameObject.transform.parent.transform.parent.gameObject);
+        Destroy(this.gameObject);
     }
     void button1Listener()
     {
         value = 1;
         this.transform.root.BroadcastMessage("baseValue", value);
-        Destroy(this.gameObject.transform.parent.transform.parent.gameObject);
+        Destroy(this.gameObject);
     }
     void button2Listener()
     {
         value = 2;
         this.transform.root.BroadcastMessage("baseValue", value);
-        Destroy(this.gameObject.transform.parent.transform.parent.gameObject);
+        Destroy(this.gameObject);
     }
     void button3Listener()
     {
         value = 3;
         this.transform.root.BroadcastMessage("baseValue", value);
-        Destroy(this.gameObject.transform.parent.transform.parent.gameObject);
+        Destroy(this.gameObject);
     }
     void button4Listener()
     {
         value = 4;
         this.transform.root.BroadcastMessage("baseValue", value);
-        Destroy(this.gameObject.transform.parent.transform.parent.gameObject);
+        Destroy(this.gameObject);
     }
     void button5Listener()
     {
         value = 5;
         this.transform.root.BroadcastMessage("baseValue", value);
-        Destroy(this.gameObject.transform.parent.transform.parent.gameObject);
+        Destroy(this.gameObject);
     }
     void button6Listener()
     {
         value = 6;
         this.transform.root.BroadcastMessage("baseValue", value);
-        Destroy(this.gameObject.transform.parent.transform.parent.gameObject);
+        Destroy(this.gameObject);
     }
     void button7Listener()
     {
         value = 7;
         this.transform.root.BroadcastMessage("baseValue", value);
-        Destroy(this.gameObject.transform.parent.transform.parent.gameObject);
+        Destroy(this.gameObject);
     }
     void button8Listener()
     {
         value = 8;
         this.transform.root.BroadcastMessage("baseValue", value);
-        Destroy(this.gameObject.transform.parent.transform.parent.gameObject);
+        Destroy(this.gameObject);
     }
     void button9Listener()
     {
         value = 9;
         this.transform.root.BroadcastMessage("baseValue", value);
-        Destroy(this.gameObject.transform.parent.transform.parent.gameObject);
+        Destroy(this.gameObject);
     }
 }

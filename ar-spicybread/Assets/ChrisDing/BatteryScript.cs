@@ -7,34 +7,69 @@ using UnityEngine.UI;
 public class BatteryScript : MonoBehaviour
 {
     private bool placing;
+    private bool valuePlacing;
+    private bool selectingValue;
+    private GameObject canvas;
+    private int voltageValue;
     TapToPlaceParent SpiceCollectionScript;
     Graph graph;
     NodeManager nodes;
     Text valueText;
     public Text text;
 
+    public int VoltageValue
+    {
+        get
+        {
+            return voltageValue;
+        }
+
+        set
+        {
+            voltageValue = value;
+        }
+    }
+
     // Use this for initialization
     void Start()
     {
         placing = true;
+        selectingValue = false;
         Transform SpiceCollection = this.transform.parent.transform;
         transform.rotation = SpiceCollection.rotation;
         SpiceCollectionScript = SpiceCollection.GetComponentInChildren<TapToPlaceParent>();
         SpiceCollectionScript.getPlacingMutex();
         graph = SpiceCollection.gameObject.GetComponentInChildren<GraphManager>().getGraph();
         nodes = SpiceCollection.gameObject.GetComponentInChildren<NodeManager>();
+
+        canvas = SpiceCollectionScript.canvas;
     }
 
     private void OnSelect()
     {
-        if (placing)
+        if (!SpiceCollectionScript.getValuePlacement())
         {
-            SpiceCollectionScript.returnPlacingMutex();
-            placing = false;
+            if (placing)
+            {
+                SpiceCollectionScript.returnPlacingMutex();
+                placing = false;
+            }
+            else if (SpiceCollectionScript.getPlacingMutex())
+            {
+                placing = true;
+            }
         }
-        else if (SpiceCollectionScript.getPlacingMutex())
+        else
         {
-            placing = true;
+            if (SpiceCollectionScript.setValuePlacement())
+            {
+                valuePlacing = true;
+                if (!selectingValue)
+                {
+                    canvas.GetComponentInChildren<CanvasScript>().createBaseView().transform.position = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z);
+                    selectingValue = true;
+                }
+            }
         }
     }
 
@@ -74,10 +109,21 @@ public class BatteryScript : MonoBehaviour
             valueText.rectTransform.SetPositionAndRotation(new Vector3(this.gameObject.transform.position.x, this.gameObject.transform.position.y + 0.04f, this.gameObject.transform.position.z), Quaternion.LookRotation(Camera.main.transform.forward, Camera.main.transform.up));
             valueText.alignment = TextAnchor.LowerCenter;
         }
+        valueText.text = textToChange + " V";
     }
 
+    void baseValue(int x)
+    {
+        if (valuePlacing)
+        {
+            changeText(x.ToString());
+            VoltageValue = x;
+            valuePlacing = false;
+            selectingValue = false;
+        }
+    }
 
-        void OnTriggerEnter(Collider collision)
+            void OnTriggerEnter(Collider collision)
     {
         if (collision.gameObject.name.Contains("Recycling"))
         {

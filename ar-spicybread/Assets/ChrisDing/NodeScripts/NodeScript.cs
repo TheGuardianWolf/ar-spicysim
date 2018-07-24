@@ -152,6 +152,9 @@ public class NodeScript : MonoBehaviour {
 
     void OnDestroy()
     {
-        Destroy(valueText.gameObject);
+        if (valueText != null)
+        {
+            Destroy(valueText.gameObject);
+        }
     }
 }

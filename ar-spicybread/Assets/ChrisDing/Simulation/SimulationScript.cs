@@ -62,7 +62,7 @@ public class SimulationScript : MonoBehaviour {
 
             if (graph.Contents[i].Value.name.Contains("ResistorComponent"))
             {
-                double value = 100.0;
+                double value = graph.Contents[i].Value.GetComponentInChildren<ResistorScript>().VoltageValue;
 
                 foreach (Transform child in graph.Contents[i].Value.transform)
                 {
@@ -84,7 +84,7 @@ public class SimulationScript : MonoBehaviour {
             else if (graph.Contents[i].Value.name.Contains("BatteryComponent"))
             {
 
-                double value = 5.0;
+                double value = graph.Contents[i].Value.GetComponentInChildren<BatteryScript>().VoltageValue;
 
                 foreach (Transform child in graph.Contents[i].Value.transform)
                 {
