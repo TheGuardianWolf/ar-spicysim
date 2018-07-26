@@ -143,16 +143,16 @@ public class AutoPlacement : MonoBehaviour {
         {
             if (distanceFromBefore < 4)
             {
-                resistor.transform.localPosition = new Vector3(/*distanceFromBefore * 0.05f + */(index - numSame) * 0.65f - ((sortedComponents.Count() * 0.9f) / 2) - distanceFromBefore * (0.65f / 4), 0.04f, 0.2f * item.pos.y - 1);
+                resistor.transform.localPosition = new Vector3(/*distanceFromBefore * 0.05f + */(index - numSame) * 0.45f - ((sortedComponents.Count() * 0.9f) / 2) - distanceFromBefore * (0.45f / 4), 0.04f, 0.2f * item.pos.y - 1);
             }
             else
             {
-                resistor.transform.localPosition = new Vector3(/*distanceFromBefore * 0.05f + */(index - numSame) * 0.65f - ((sortedComponents.Count() * 0.9f) / 2), 0.04f, 0.2f * item.pos.y - 1);
+                resistor.transform.localPosition = new Vector3(/*distanceFromBefore * 0.05f + */(index - numSame) * 0.45f - ((sortedComponents.Count() * 0.9f) / 2), 0.04f, 0.2f * item.pos.y - 1);
             }
         }
         else
         {
-            resistor.transform.localPosition = new Vector3(/*distanceFromBefore * 0.05f + */(index - 1 - numSame) * 0.65f - ((sortedComponents.Count() * 0.9f) / 2), 0.04f, 0.2f * item.pos.y - 1);
+            resistor.transform.localPosition = new Vector3(/*distanceFromBefore * 0.05f + */(index - 1 - numSame) * 0.45f - ((sortedComponents.Count() * 0.9f) / 2), 0.04f, 0.2f * item.pos.y - 1);
         }
     }
 
