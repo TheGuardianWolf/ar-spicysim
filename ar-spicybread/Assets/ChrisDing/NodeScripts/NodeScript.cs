@@ -23,7 +23,7 @@ public class NodeScript : MonoBehaviour {
         attachedNodeID = graph.getNewNodeID();
     }
 
-    void onGround()
+    public void onGround()
     {
         if (SpiceCollectionScript.getFirstWiringComponent() != null && SpiceCollectionScript.getFirstWiringComponent() == gameObject)
         {
@@ -62,28 +62,7 @@ public class NodeScript : MonoBehaviour {
             {
                 if (SpiceCollectionScript.getFirstWiringComponent() != null && SpiceCollectionScript.getFirstWiringComponent().transform.parent != gameObject.transform.parent)
                 {
-                    createWire(gameObject.transform.position, SpiceCollectionScript.getFirstWiringComponent().transform.position, lineMaterial, this.transform);
-
-                    //same node for both gameobjects
-                    int newNode = graph.getNewNodeID();
-
-                    //iteratively turn all nodes into same node
-                    foreach (GameObject node in nodes.getNodes())
-                    {
-                        if (node.GetComponentInChildren<NodeScript>().attachedNodeID == this.attachedNodeID || node.GetComponentInChildren<NodeScript>().attachedNodeID == SpiceCollectionScript.getFirstWiringComponent().GetComponentInChildren<NodeScript>().attachedNodeID)
-                        {
-                            if (node != gameObject && node != SpiceCollectionScript.getFirstWiringComponent())
-                            {
-                                node.GetComponentInChildren<NodeScript>().changeAttachedNodeID(newNode);
-                            }
-                        }
-                    }
-
-                    changeAttachedNodeID(newNode);
-                    SpiceCollectionScript.getFirstWiringComponent().GetComponentInChildren<NodeScript>().changeAttachedNodeID(newNode);
-
-                    Debug.Log("Clear 1");
-                    SpiceCollectionScript.clearFirstWiringSelected();
+                    mergeNet(SpiceCollectionScript.getFirstWiringComponent());
                 }
                 else
                 {
@@ -111,6 +90,31 @@ public class NodeScript : MonoBehaviour {
             valueText.alignment = TextAnchor.LowerCenter;
         }
         valueText.text = textToChange;
+    }
+
+    public void mergeNet(GameObject ob)
+    {
+        createWire(gameObject.transform.position, ob.transform.position, lineMaterial, this.transform);
+
+        //same node for both gameobjects
+        int newNode = graph.getNewNodeID();
+
+        //iteratively turn all nodes into same node
+        foreach (GameObject node in nodes.getNodes())
+        {
+            if (node.GetComponentInChildren<NodeScript>().attachedNodeID == this.attachedNodeID || node.GetComponentInChildren<NodeScript>().attachedNodeID == ob.GetComponentInChildren<NodeScript>().attachedNodeID)
+            {
+                if (node != gameObject && node != ob)
+                {
+                    node.GetComponentInChildren<NodeScript>().changeAttachedNodeID(newNode);
+                }
+            }
+        }
+
+        changeAttachedNodeID(newNode);
+        ob.GetComponentInChildren<NodeScript>().changeAttachedNodeID(newNode);
+
+        SpiceCollectionScript.clearFirstWiringSelected();
     }
 
     public static LineRenderer createWire(Vector3 node1, Vector3 node2, Material mat, Transform parent)

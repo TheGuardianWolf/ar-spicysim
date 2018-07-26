@@ -9,6 +9,7 @@ public class AutoPlacement : MonoBehaviour {
 
     private List<Item> realComponents;
     private List<Item> sortedComponents;
+    private List<ItemComponentPair> pair;
     private GraphManager graph;
     public GameObject resistorPrefab;
 
@@ -29,6 +30,7 @@ public class AutoPlacement : MonoBehaviour {
     void Start () {
         graph = GetComponentInChildren<GraphManager>();
         RealComponents = new List<Item>();
+        pair = new List<ItemComponentPair>();
 	}
 
     public void test()
@@ -36,23 +38,31 @@ public class AutoPlacement : MonoBehaviour {
         Item i1 = new Item();
         i1.pos = new Point();
         i1.pos.x = 32;
-        i1.pos.y = 4;
+        i1.pos.y = 1;
         i1.type = ItemType.RESISTOR;
         RealComponents.Add(i1);
 
         Item i2 = new Item();
         i2.pos = new Point();
-        i2.pos.x = 25;
-        i2.pos.y = 3;
+        i2.pos.x = 40;
+        i2.pos.y = 2;
         i2.type = ItemType.RESISTOR;
         RealComponents.Add(i2);
 
         Item i3 = new Item();
         i3.pos = new Point();
-        i3.pos.x = 32;
+        i3.pos.x = 36;
         i3.pos.y = 3;
         i3.type = ItemType.RESISTOR;
         RealComponents.Add(i3);
+
+        Item i4 = new Item();
+        i4.pos = new Point();
+        i4.pos.x = 34;
+        i4.pos.y = 4;
+        i4.type = ItemType.RESISTOR;
+        RealComponents.Add(i4);
+
         onGenerate();
     }
 
@@ -66,24 +76,29 @@ public class AutoPlacement : MonoBehaviour {
             }
         }
 
-        sortedComponents = RealComponents.OrderBy(o => o.pos.x).ToList();
+        sortedComponents = RealComponents.OrderBy(o => o.pos.x).ThenBy(o => o.pos.y).ToList();
         foreach (Item item in sortedComponents.ToList())
         {
             int distanceFromBefore = 0;
             int index = sortedComponents.IndexOf(item);
             bool sameAsLast = false;
             int numSame = 0;
+            List<ItemComponentPair> pairFoundParallel = null;
+            ItemComponentPair closestComponentParallel = null;
             if (index > 0)
             {
-                distanceFromBefore = item.pos.x - sortedComponents[index - 1].pos.x;
-                if (item.pos.x == sortedComponents[index - 1].pos.x)
+                pairFoundParallel = pair.FindAll(o => o.Item.pos.x == (item.pos.x));
+                if (pairFoundParallel.Count > 0)
                 {
+                    ItemComponentPair closestComponent = pair.Find(i => i.Item.pos.y == pairFoundParallel.Min(o => o.Item.pos.y));
                     sameAsLast = true;
                 }
                 else
                 {
                     sameAsLast = false;
                 }
+
+                distanceFromBefore = item.pos.x - sortedComponents[index - 1].pos.x;
             }
             else
             {
@@ -92,8 +107,19 @@ public class AutoPlacement : MonoBehaviour {
 
             GameObject newResistor = createNewResistor(distanceFromBefore, index, item, sameAsLast, numSame);
 
+            pair.Add(new ItemComponentPair(newResistor, item));
+
+            //see if any components connected in series
+            List<ItemComponentPair> pairFoundSeries = pair.FindAll(o => o.Item.pos.x == (item.pos.x - 4));
+            if (pairFoundSeries.Count > 0)
+            {
+                ItemComponentPair closestComponent = pair.Find(i => i.Item.pos.y == pairFoundSeries.Max(o => o.Item.pos.y));
+                StartCoroutine(ConnectSeries(closestComponent.Component, newResistor));
+            }
+
             if (sameAsLast)
             {
+                StartCoroutine(ConnectParallel(newResistor, closestComponentParallel.Component));
                 numSame++;
             }
         }
@@ -115,22 +141,65 @@ public class AutoPlacement : MonoBehaviour {
         GetComponentInChildren<TapToPlaceParent>().returnPlacingMutex();
         if (!sameAsLast)
         {
-            resistor.transform.localPosition = new Vector3(/*distanceFromBefore * 0.05f + */(index - numSame) * 0.8f - ((sortedComponents.Count() * 0.9f) / 2), 0.024f, 0.2f * item.pos.y - 1);
+            if (distanceFromBefore < 4)
+            {
+                resistor.transform.localPosition = new Vector3(/*distanceFromBefore * 0.05f + */(index - numSame) * 0.65f - ((sortedComponents.Count() * 0.9f) / 2) - distanceFromBefore * (0.65f / 4), 0.04f, 0.2f * item.pos.y - 1);
+            }
+            else
+            {
+                resistor.transform.localPosition = new Vector3(/*distanceFromBefore * 0.05f + */(index - numSame) * 0.65f - ((sortedComponents.Count() * 0.9f) / 2), 0.04f, 0.2f * item.pos.y - 1);
+            }
         }
         else
         {
-            resistor.transform.localPosition = new Vector3(/*distanceFromBefore * 0.05f + */(index - 1 - numSame) * 0.8f - ((sortedComponents.Count() * 0.9f) / 2), 0.024f, 0.2f * item.pos.y - 1);
+            resistor.transform.localPosition = new Vector3(/*distanceFromBefore * 0.05f + */(index - 1 - numSame) * 0.65f - ((sortedComponents.Count() * 0.9f) / 2), 0.04f, 0.2f * item.pos.y - 1);
         }
     }
 
-    private Vector3 getRelativePosition(Transform origin, Vector3 position)
+    IEnumerator ConnectParallel(GameObject newResistor, GameObject otherResistor)
     {
-        Vector3 distance = position - origin.position;
-        Vector3 relativePosition = Vector3.zero;
-        relativePosition.x = Vector3.Dot(distance, origin.right.normalized);
-        relativePosition.y = Vector3.Dot(distance, origin.up.normalized);
-        relativePosition.z = Vector3.Dot(distance, origin.forward.normalized);
+        yield return new WaitForFixedUpdate();
+        foreach (Transform child in newResistor.transform)
+        {
+            if (child.gameObject.name == "LeftNode")
+            {
+                foreach (Transform child1 in otherResistor.transform)
+                {
+                    if (child1.gameObject.name == "LeftNode")
+                    {
+                        child.GetComponentInChildren<NodeScript>().mergeNet(child1.gameObject);
+                    }
+                }
+            }
 
-        return relativePosition;
+            else if (child.gameObject.name == "RightNode")
+            {
+                foreach (Transform child1 in otherResistor.transform)
+                {
+                    if (child1.gameObject.name == "RightNode")
+                    {
+                        child.GetComponentInChildren<NodeScript>().mergeNet(child1.gameObject);
+                    }
+                }
+            }
+        }
+    }
+
+    IEnumerator ConnectSeries(GameObject leftResistor, GameObject RightResistor)
+    {
+        yield return new WaitForFixedUpdate();
+        foreach (Transform child in leftResistor.transform)
+        {
+            if (child.gameObject.name == "LeftNode")
+            {
+                foreach (Transform child1 in RightResistor.transform)
+                {
+                    if (child1.gameObject.name == "RightNode")
+                    {
+                        child.GetComponentInChildren<NodeScript>().mergeNet(child1.gameObject);
+                    }
+                }
+            }
+        }
     }
 }
