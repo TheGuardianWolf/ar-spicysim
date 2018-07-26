@@ -181,7 +181,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 83272111}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.804, y: 0.052, z: 0.831}
+  m_LocalPosition: {x: 0.804, y: 0.42, z: 0.831}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_Children: []
   m_Father: {fileID: 223222300}
@@ -331,6 +331,7 @@ GameObject:
   - component: {fileID: 223222301}
   - component: {fileID: 223222302}
   - component: {fileID: 223222304}
+  - component: {fileID: 223222305}
   m_Layer: 0
   m_Name: SpiceCollection
   m_TagString: Untagged
@@ -404,6 +405,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a8e2e9f6a966afd4b8883d109afbbe09, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &223222305
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 223222299}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f38468b1874e5604094d0f7bd4a747f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resistorPrefab: {fileID: 1223230395585962, guid: 4ec7930daa2b777448f03d1cbfd37d38,
+    type: 2}
 --- !u!1 &257013098
 GameObject:
   m_ObjectHideFlags: 0
@@ -485,7 +499,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 257013098}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.062, y: 0.13, z: 0.835}
+  m_LocalPosition: {x: -0.062, y: 0.47, z: 0.835}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_Children: []
   m_Father: {fileID: 223222300}
@@ -666,7 +680,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 645425792}
   m_LocalRotation: {x: -0, y: -0.258819, z: -0, w: 0.9659259}
-  m_LocalPosition: {x: 0.73, y: 0.01, z: 0.3}
+  m_LocalPosition: {x: 0.73, y: 0.4, z: 0.3}
   m_LocalScale: {x: 0.038250003, y: 0.2, z: 0.034750003}
   m_Children:
   - {fileID: 188979831}
@@ -1251,7 +1265,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4819854603363106, guid: 44f8a26c4638c9d48bedd508af100f4c, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 0.01
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 4819854603363106, guid: 44f8a26c4638c9d48bedd508af100f4c, type: 2}
       propertyPath: m_LocalPosition.z

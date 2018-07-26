@@ -3,8 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Breadboard;
 
 public class ResistorScript : MonoBehaviour {
+
 
     private bool placing;
     private bool valuePlacing;
@@ -31,17 +33,30 @@ public class ResistorScript : MonoBehaviour {
         }
     }
 
+    public bool Placing
+    {
+        get
+        {
+            return placing;
+        }
+
+        set
+        {
+            placing = value;
+        }
+    }
+
     // Use this for initialization
     void Start () {
         Vector3 scale = new Vector3(0.017375f, 0.1f, 0.019125f);
-        placing = true;
+        Placing = false;
         firstBase = true;
         valuePlacing = false;
         selectingValue = false;
         Transform SpiceCollection = this.transform.parent.transform;
         transform.rotation = SpiceCollection.rotation;
         SpiceCollectionScript = SpiceCollection.GetComponentInChildren<TapToPlaceParent>();
-        SpiceCollectionScript.getPlacingMutex();
+        Placing = true;
         graph = SpiceCollection.gameObject.GetComponentInChildren<GraphManager>().getGraph();
         nodes = SpiceCollection.gameObject.GetComponentInChildren<NodeManager>();
 
@@ -55,14 +70,14 @@ public class ResistorScript : MonoBehaviour {
     {
         if (!SpiceCollectionScript.getValuePlacement())
         {
-            if (placing)
+            if (Placing)
             {
                 SpiceCollectionScript.returnPlacingMutex();
-                placing = false;
+                Placing = false;
             }
             else if (SpiceCollectionScript.getPlacingMutex())
             {
-                placing = true;
+                Placing = true;
             }
         }
         else
@@ -81,7 +96,7 @@ public class ResistorScript : MonoBehaviour {
 
     void onRotate()
     {
-        if (placing)
+        if (Placing)
         {
             this.gameObject.transform.RotateAround(gameObject.transform.position, transform.up, 90.0f);
         }
@@ -90,7 +105,7 @@ public class ResistorScript : MonoBehaviour {
     private void Update()
     {
 
-        if (placing)
+        if (Placing)
         {
             var headPosition = Camera.main.transform.position;
             var gazeDirection = Camera.main.transform.forward;
