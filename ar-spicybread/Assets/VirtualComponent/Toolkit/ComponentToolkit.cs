@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace VirtualComponent 
 {
-    public abstract class Placer
+    public class ComponentToolkit : MonoBehaviour
     {
         private ComponentTool activeTool;
 

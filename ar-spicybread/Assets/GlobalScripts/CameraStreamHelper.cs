@@ -82,21 +82,6 @@ public class CameraStreamHelper : MonoBehaviour
         return videoCapture.GetSupportedFrameRatesForResolution(forResolution).OrderBy(r => r).FirstOrDefault();
     }
 
-#if UNITY_WSA && !UNITY_EDITOR
-    private void Awake()
-    {
-
-        if (instance != null)
-        {
-            Debug.LogError("Cannot create two instances of CamStreamManager.");
-            return;
-        }
-
-        instance = this;
-        VideoCapture.CreateAync(OnVideoCaptureInstanceCreated);
-    }
-#endif
-
     private void OnDestroy()
     {
         if (instance == this)
