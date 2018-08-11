@@ -77,7 +77,11 @@ public class BreadboardCaptureTool : ComponentTool
         spatialCoordinateSystemPtr = UnityEngine.XR.WSA.WorldManager.GetNativeISpatialCoordinateSystemPtr();
     }
 
-    public void ComponentToolSelect()
+    void OnSelect()
+    {
+        ComponentToolSelect();
+    }
+    override public void ComponentToolSelect()
     {
         if (scannerState == ScannerState.IDLE && componentToolkit.ActiveTool != this)
         {
@@ -98,7 +102,7 @@ public class BreadboardCaptureTool : ComponentTool
         }
     }
 
-    public void ComponentToolPlace()
+    override public void ComponentToolPlace()
     {
         if (scannerState == ScannerState.BUSY)
         {
@@ -113,6 +117,8 @@ public class BreadboardCaptureTool : ComponentTool
                     scannerStatus.text = "Tap to place generated circuit";
 
                     // Generate the circuit object
+                    this.transform.parent.GetComponentInChildren<AutoPlacement>().RealComponents = breadboardItemList;
+                    this.transform.parent.GetComponentInChildren<AutoPlacement>().onGenerate();
                 });
             }
             else
