@@ -12,6 +12,7 @@ using HoloLensCameraStream;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Breadboard;
+using Breadboard.ResistorClassifier;
 using VirtualComponent;
 using Assets.VirtualComponent.Display;
 
@@ -19,6 +20,8 @@ using Assets.VirtualComponent.Display;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Graphics.Imaging;
 using Windows.Storage.Streams;
+using Windows.Storage;
+using Windows.Media;
 #endif
 
 /// <summary>
@@ -27,7 +30,7 @@ using Windows.Storage.Streams;
 /// </summary>
 public class BreadboardCaptureTool : ComponentTool
 {
-    private readonly string ML_MODEL_PATH = "ms-appx:///Assets/resistor_classifier.onnx";
+    private readonly string ML_MODEL_PATH = "ms-appx:///Data/StreamingAssets/resistor_classifier.onnx";
 
     private DebugServer debugServer;
     private ComponentToolkit componentToolkit;
@@ -113,32 +116,26 @@ public class BreadboardCaptureTool : ComponentTool
             {
                 Task.Run(async () =>
                 {
+//#if WINDOWS_UWP
+//                    var mlModel = await ResistorClassifierModel.CreateResistorClassifierModel(await StorageFile.GetFileFromApplicationUriAsync(new Uri($"ms-appx:///Data/StreamingAssets/resistor_classifier.onnx")));
 
-#if WINDOWS_UWP
-                    //Windows.Storage.StorageFolder appInstalledFolder = Windows.ApplicationModel.Package.Current.InstalledLocation;
-                    //Windows.Storage.StorageFolder assets = await appInstalledFolder.GetFolderAsync("Assets");
-                    //var resistorClassifierFile = await assets.GetFileAsync("resistor_classifier.onnx");
-                    //var testImage = await assets.GetFileAsync("mltest.png");
+//                    SoftwareBitmap softwareBitmap;
+//                    using (IRandomAccessStream stream = await (await StorageFile.GetFileFromApplicationUriAsync(new Uri($"ms-appx:///Data/StreamingAssets/mltest.png"))).OpenAsync(Windows.Storage.FileAccessMode.Read)) 
+//                    {
+//                        // Create the decoder from the stream
+//                        BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
 
-                    //var mlModel = await Breadboard.ResistorClassifier.ResistorClassifierModel.CreateResistorClassifierModel(resistorClassifierFile);
+//                        // Get the SoftwareBitmap representation of the file
+//                        softwareBitmap = await decoder.GetSoftwareBitmapAsync();
+//                    }
 
-                    //SoftwareBitmap softwareBitmap;
-                    //using (IRandomAccessStream stream = await testImage.OpenAsync(Windows.Storage.FileAccessMode.Read))
-                    //{
-                    //    // Create the decoder from the stream
-                    //    BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
+//                    var mlInput = new ResistorClassifierModelInput();
+//                    mlInput.data = VideoFrame.CreateWithSoftwareBitmap(softwareBitmap);
+//                    var mlOutput = await mlModel.EvaluateAsync(mlInput);
 
-                    //    // Get the SoftwareBitmap representation of the file
-                    //    softwareBitmap = await decoder.GetSoftwareBitmapAsync();
-                    //}
-
-                    //var mlInput = new Breadboard.ResistorClassifier.ResistorClassifierModelInput();
-                    //mlInput.data = Windows.Media.VideoFrame.CreateWithSoftwareBitmap(softwareBitmap);
-                    //var mlOutput = await mlModel.EvaluateAsync(mlInput);
-
-                    //softwareBitmap.Dispose();
-                    //mlInput.data.Dispose();
-#endif
+//                    softwareBitmap.Dispose();
+//                    mlInput.data.Dispose();
+//#endif
                     await breadboardScannerML.RunScannerAsync(lastDetectionBytes, _resolution.width, _resolution.height);
                     breadboardScannerML.GetList(breadboardItemList);
                     scannerState = ScannerState.DONE;
