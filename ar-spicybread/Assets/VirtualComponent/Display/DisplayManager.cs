@@ -9,14 +9,7 @@ namespace Assets.VirtualComponent.Display
 {
     class DisplayManager : MonoBehaviour
     {
-        private TextMesh hudTooltip;
-        public TextMesh HudTooltip
-        {
-            get
-            {
-                return hudTooltip;
-            }
-        }
+        public TextMesh HudTooltip;
 
         public void ShowHUD()
         {

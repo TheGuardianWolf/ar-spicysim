@@ -27,13 +27,13 @@ using Windows.Storage.Streams;
 /// </summary>
 public class BreadboardCaptureTool : ComponentTool
 {
-    private readonly string ML_MODEL_PATH = "msappx://Assets/ResistorClassifier.onnx";
+    private readonly string ML_MODEL_PATH = "ms-appx:///Assets/resistor_classifier.onnx";
 
     private DebugServer debugServer;
     private ComponentToolkit componentToolkit;
     private DisplayManager displayManager;
 
-    private TextMesh scannerStatus;
+    public TextMesh scannerStatus;
 
     private HoloLensCameraStream.Resolution _resolution;
     private VideoCapture videoCapture;
@@ -75,6 +75,8 @@ public class BreadboardCaptureTool : ComponentTool
 
         //Fetch a pointer to Unity's spatial coordinate system if you need pixel mapping
         spatialCoordinateSystemPtr = UnityEngine.XR.WSA.WorldManager.GetNativeISpatialCoordinateSystemPtr();
+
+        scannerStatus.text = "Tool is idle";
     }
 
     void OnSelect()
@@ -124,7 +126,7 @@ public class BreadboardCaptureTool : ComponentTool
             else
             {
                 scannerState = ScannerState.IDLE;
-                scannerStatus.text = "";
+                scannerStatus.text = "Tool is idle";
             }
         }
         else if (scannerState == ScannerState.DONE)
@@ -132,7 +134,7 @@ public class BreadboardCaptureTool : ComponentTool
             // Place the circuit object
 
             scannerState = ScannerState.IDLE;
-            scannerStatus.text = "";
+            scannerStatus.text = "Tool is idle";
             lastDetectionBytes = null;
             breadboardItemList.Clear();
         }
