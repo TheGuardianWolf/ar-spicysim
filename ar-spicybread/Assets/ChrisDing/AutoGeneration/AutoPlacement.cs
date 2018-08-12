@@ -35,35 +35,35 @@ public class AutoPlacement : MonoBehaviour {
 
     public void test()
     {
-        Item i1 = new Item();
-        i1.pos = new Point();
-        i1.pos.x = 32;
-        i1.pos.y = 1;
-        i1.type = ItemType.RESISTOR;
-        RealComponents.Add(i1);
+        //Item i1 = new Item();
+        //i1.pos = new Point();
+        //i1.pos.x = 32;
+        //i1.pos.y = 1;
+        //i1.type = ItemType.RESISTOR;
+        //RealComponents.Add(i1);
 
-        Item i2 = new Item();
-        i2.pos = new Point();
-        i2.pos.x = 40;
-        i2.pos.y = 2;
-        i2.type = ItemType.RESISTOR;
-        RealComponents.Add(i2);
+        //Item i2 = new Item();
+        //i2.pos = new Point();
+        //i2.pos.x = 40;
+        //i2.pos.y = 2;
+        //i2.type = ItemType.RESISTOR;
+        //RealComponents.Add(i2);
 
-        Item i3 = new Item();
-        i3.pos = new Point();
-        i3.pos.x = 36;
-        i3.pos.y = 3;
-        i3.type = ItemType.RESISTOR;
-        RealComponents.Add(i3);
+        //Item i3 = new Item();
+        //i3.pos = new Point();
+        //i3.pos.x = 36;
+        //i3.pos.y = 3;
+        //i3.type = ItemType.RESISTOR;
+        //RealComponents.Add(i3);
 
-        Item i4 = new Item();
-        i4.pos = new Point();
-        i4.pos.x = 34;
-        i4.pos.y = 4;
-        i4.type = ItemType.RESISTOR;
-        RealComponents.Add(i4);
+        //Item i4 = new Item();
+        //i4.pos = new Point();
+        //i4.pos.x = 34;
+        //i4.pos.y = 4;
+        //i4.type = ItemType.RESISTOR;
+        //RealComponents.Add(i4);
 
-        onGenerate();
+        //onGenerate();
     }
 
     public void onGenerate()

@@ -32,7 +32,6 @@ public class BreadboardCaptureTool : ComponentTool
     private DebugServer debugServer;
     private ComponentToolkit componentToolkit;
     private DisplayManager displayManager;
-
     public TextMesh scannerStatus;
 
     private HoloLensCameraStream.Resolution _resolution;
@@ -79,10 +78,11 @@ public class BreadboardCaptureTool : ComponentTool
         scannerStatus.text = "Tool is idle";
     }
 
-    void OnSelect()
-    {
-        ComponentToolSelect();
-    }
+    //void OnSelect()
+    //{
+    //    ComponentToolSelect();
+    //}
+
     override public void ComponentToolSelect()
     {
         if (scannerState == ScannerState.IDLE && componentToolkit.ActiveTool != this)
@@ -96,16 +96,16 @@ public class BreadboardCaptureTool : ComponentTool
             displayManager.HudTooltip.color = new Color(255, 255, 255);
             CameraStreamHelper.Instance.GetVideoCaptureAsync(OnVideoCaptureCreated);
         }
-        else if (scannerState == ScannerState.DONE)
+        else if (scannerState == ScannerState.DONE && componentToolkit.ActiveTool != this)
         {
             componentToolkit.ActiveTool = this;
-
             // Change cursor to circuit model
         }
     }
 
     override public void ComponentToolPlace()
     {
+        componentToolkit.ActiveTool = null;
         if (scannerState == ScannerState.BUSY)
         {
             StopFrameCapture();
@@ -113,6 +113,32 @@ public class BreadboardCaptureTool : ComponentTool
             {
                 Task.Run(async () =>
                 {
+
+#if WINDOWS_UWP
+                    //Windows.Storage.StorageFolder appInstalledFolder = Windows.ApplicationModel.Package.Current.InstalledLocation;
+                    //Windows.Storage.StorageFolder assets = await appInstalledFolder.GetFolderAsync("Assets");
+                    //var resistorClassifierFile = await assets.GetFileAsync("resistor_classifier.onnx");
+                    //var testImage = await assets.GetFileAsync("mltest.png");
+
+                    //var mlModel = await Breadboard.ResistorClassifier.ResistorClassifierModel.CreateResistorClassifierModel(resistorClassifierFile);
+
+                    //SoftwareBitmap softwareBitmap;
+                    //using (IRandomAccessStream stream = await testImage.OpenAsync(Windows.Storage.FileAccessMode.Read))
+                    //{
+                    //    // Create the decoder from the stream
+                    //    BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
+
+                    //    // Get the SoftwareBitmap representation of the file
+                    //    softwareBitmap = await decoder.GetSoftwareBitmapAsync();
+                    //}
+
+                    //var mlInput = new Breadboard.ResistorClassifier.ResistorClassifierModelInput();
+                    //mlInput.data = Windows.Media.VideoFrame.CreateWithSoftwareBitmap(softwareBitmap);
+                    //var mlOutput = await mlModel.EvaluateAsync(mlInput);
+
+                    //softwareBitmap.Dispose();
+                    //mlInput.data.Dispose();
+#endif
                     await breadboardScannerML.RunScannerAsync(lastDetectionBytes, _resolution.width, _resolution.height);
                     breadboardScannerML.GetList(breadboardItemList);
                     scannerState = ScannerState.DONE;
@@ -146,7 +172,7 @@ public class BreadboardCaptureTool : ComponentTool
         if (videoCapture != null)
         {
             videoCapture.FrameSampleAcquired -= OnFrameSampleAcquired;
-            videoCapture.Dispose();
+            videoCapture.StopVideoModeAsync((VideoCaptureResult result) => { });
         }
     }
 
@@ -182,7 +208,7 @@ public class BreadboardCaptureTool : ComponentTool
         cameraParams.rotateImage180Degrees = false; //If your image is upside down, remove this line.
         cameraParams.enableHolograms = false;
 
-        //videoCapture.StartVideoModeAsync(cameraParams, OnVideoModeStarted);
+        videoCapture.StartVideoModeAsync(cameraParams, OnVideoModeStarted);
     }
 
     private void OnVideoModeStarted(VideoCaptureResult result)
@@ -211,8 +237,11 @@ public class BreadboardCaptureTool : ComponentTool
             {
                 if (lastDetectionBytes == null)
                 {
-                    displayManager.HudTooltip.text = "Breadboard captured, tap to exit or continue to refresh";
-                    displayManager.HudTooltip.color = new Color(0, 255, 0);
+                    UnityEngine.WSA.Application.InvokeOnAppThread(() =>
+                    {
+                        displayManager.HudTooltip.text = "Breadboard captured, tap to exit or continue to refresh";
+                        displayManager.HudTooltip.color = new Color(0, 255, 0);
+                    }, false);
                 }
                 lastDetectionBytes = latestImageBytes;
             }

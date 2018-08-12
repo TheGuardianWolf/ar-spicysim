@@ -21,6 +21,27 @@ namespace VirtualComponent
                 activeTool = value;
             }
         }
+
+        void Start()
+        {
+            GazeGestureManager.OnTappedEvent += OnTapped;
+        }
+
+        void OnTapped(GameObject focusedObject)
+        {
+            if (activeTool == null)
+            {
+                var componentTool = focusedObject.GetComponentInChildren<ComponentTool>();
+                if (componentTool != null)
+                {
+                    componentTool.ComponentToolSelect();
+                } 
+            }
+            else
+            {
+                activeTool.ComponentToolPlace();
+            }
+        }
     }
 }
 

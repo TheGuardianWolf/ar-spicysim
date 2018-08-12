@@ -1555,7 +1555,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff52b7bca02b3ce48b1d0e89c7b7b8d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HudTooltip: {fileID: 0}
+  HudTooltip: {fileID: 613639067}
 --- !u!4 &1455960397
 Transform:
   m_ObjectHideFlags: 0

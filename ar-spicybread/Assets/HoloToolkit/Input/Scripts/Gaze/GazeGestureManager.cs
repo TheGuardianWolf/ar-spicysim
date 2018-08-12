@@ -1,9 +1,14 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.XR.WSA.Input;
 
 public class GazeGestureManager : MonoBehaviour
 {
     public static GazeGestureManager Instance { get; private set; }
+
+    public delegate void OnTappedEventHandler(GameObject focusedObject);
+
+    public static event OnTappedEventHandler OnTappedEvent;
 
     // Represents the hologram that is currently being gazed at.
     public GameObject FocusedObject { get; private set; }
@@ -22,6 +27,11 @@ public class GazeGestureManager : MonoBehaviour
             // Send an OnSelect message to the focused object and its children.
             if (FocusedObject != null)
             {
+                if (OnTappedEvent != null)
+                {
+                    OnTappedEvent(FocusedObject);
+                }
+                    
                 if (FocusedObject.name.Contains("ResistorComponent") || FocusedObject.name.Contains("BatteryComponent") || FocusedObject.name.Contains("Node"))
                 {
                     FocusedObject.SendMessage("OnSelect", SendMessageOptions.DontRequireReceiver);
@@ -30,6 +40,10 @@ public class GazeGestureManager : MonoBehaviour
                 {
                     FocusedObject.SendMessageUpwards("OnSelect", SendMessageOptions.DontRequireReceiver);
                 }
+            }
+            else
+            {
+                BroadcastMessage("OnTapped", null);
             }
         };
         recognizer.StartCapturingGestures();
