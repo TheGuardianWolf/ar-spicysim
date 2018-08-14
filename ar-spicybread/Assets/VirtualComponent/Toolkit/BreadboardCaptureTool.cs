@@ -12,7 +12,7 @@ using HoloLensCameraStream;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Breadboard;
-using Breadboard.ResistorClassifier;
+using Breadboard.AI;
 using VirtualComponent;
 using Assets.VirtualComponent.Display;
 
@@ -44,8 +44,6 @@ public class BreadboardCaptureTool : ComponentTool
     
     private byte[] lastDetectionBytes;
     private int frameNumber = 0;
-    private bool detection = false;
-    private bool mlInitialised = false;
     private List<Item> breadboardItemList = new List<Item>();
     private ScannerState scannerState = ScannerState.IDLE;
 
@@ -70,21 +68,25 @@ public class BreadboardCaptureTool : ComponentTool
             new int[2] { 2, 5 }, 11
         );
 
-        Task.Run(async () => {
-            await breadboardScannerML.InitWinMLAsync(ML_MODEL_PATH);
-            mlInitialised = true;
-        });
-
         //Fetch a pointer to Unity's spatial coordinate system if you need pixel mapping
         spatialCoordinateSystemPtr = UnityEngine.XR.WSA.WorldManager.GetNativeISpatialCoordinateSystemPtr();
 
-        scannerStatus.text = "Tool is idle";
-    }
+        scannerStatus.text = "Tool is initialising";
 
-    //void OnSelect()
-    //{
-    //    ComponentToolSelect();
-    //}
+#if WINDOWS_UWP
+        Task.Run(async () =>
+        {
+            var mlFile = await StorageFile.GetFileFromApplicationUriAsync(new Uri(ML_MODEL_PATH));
+            IModel mlModel = await Breadboard.AI.ResistorClassifier.ResistorClassifierModel.CreateResistorClassifierModel(mlFile);
+            breadboardScannerML.SetMLModel(mlModel);
+
+            UnityEngine.WSA.Application.InvokeOnAppThread(() =>
+            {
+                scannerStatus.text = "Tool is idle";
+            }, false);
+        }).Wait();       
+#endif      
+    }
 
     override public void ComponentToolSelect()
     {
@@ -112,30 +114,17 @@ public class BreadboardCaptureTool : ComponentTool
         if (scannerState == ScannerState.BUSY)
         {
             StopFrameCapture();
+
+            UnityEngine.WSA.Application.InvokeOnAppThread(() =>
+            {
+                displayManager.HudTooltip.text = "";
+                displayManager.HudTooltip.color = Color.white;
+            }, false);
+
             if (lastDetectionBytes != null)
             {
                 Task.Run(async () =>
                 {
-//#if WINDOWS_UWP
-//                    var mlModel = await ResistorClassifierModel.CreateResistorClassifierModel(await StorageFile.GetFileFromApplicationUriAsync(new Uri($"ms-appx:///Data/StreamingAssets/resistor_classifier.onnx")));
-
-//                    SoftwareBitmap softwareBitmap;
-//                    using (IRandomAccessStream stream = await (await StorageFile.GetFileFromApplicationUriAsync(new Uri($"ms-appx:///Data/StreamingAssets/mltest.png"))).OpenAsync(Windows.Storage.FileAccessMode.Read)) 
-//                    {
-//                        // Create the decoder from the stream
-//                        BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
-
-//                        // Get the SoftwareBitmap representation of the file
-//                        softwareBitmap = await decoder.GetSoftwareBitmapAsync();
-//                    }
-
-//                    var mlInput = new ResistorClassifierModelInput();
-//                    mlInput.data = VideoFrame.CreateWithSoftwareBitmap(softwareBitmap);
-//                    var mlOutput = await mlModel.EvaluateAsync(mlInput);
-
-//                    softwareBitmap.Dispose();
-//                    mlInput.data.Dispose();
-//#endif
                     await breadboardScannerML.RunScannerAsync(lastDetectionBytes, _resolution.width, _resolution.height);
                     breadboardScannerML.GetList(breadboardItemList);
                     scannerState = ScannerState.DONE;
@@ -185,7 +174,7 @@ public class BreadboardCaptureTool : ComponentTool
             Debug.LogError("Did not find a video capture object. You may not be using the HoloLens.");
             return;
         }
-        
+
         this.videoCapture = videoCapture;
 
         //Request the spatial coordinate ptr if you want fetch the camera and set it if you need to 
@@ -237,7 +226,7 @@ public class BreadboardCaptureTool : ComponentTool
                     UnityEngine.WSA.Application.InvokeOnAppThread(() =>
                     {
                         displayManager.HudTooltip.text = "Breadboard captured, tap to exit or continue to refresh";
-                        displayManager.HudTooltip.color = new Color(0, 255, 0);
+                        displayManager.HudTooltip.color = Color.green;
                     }, false);
                 }
                 lastDetectionBytes = latestImageBytes;
