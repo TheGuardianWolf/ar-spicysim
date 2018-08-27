@@ -3,7 +3,6 @@
 public class TapToPlaceParent : MonoBehaviour
 {
     public GameObject cursor;
-    public GameObject cursorVisual;
     public GameObject canvas;
     private bool placing = true;
     private bool wiring = false;
@@ -31,7 +30,6 @@ public class TapToPlaceParent : MonoBehaviour
             // On each Select gesture, toggle whether the user is in placing mode.
             placing = false;
             //SpatialMapping.Instance.DrawVisualMeshes = false;
-            gameObject.GetComponentInChildren<AutoPlacement>().test();
             //this.cursor.SetActive(true);
         }
     }

@@ -66,13 +66,11 @@ public class NodeScript : MonoBehaviour {
                 }
                 else
                 {
-                    Debug.Log("Clear 2");
                     SpiceCollectionScript.clearFirstWiringSelected();
                 }
             }
             else
             {
-                Debug.Log("Set");
                 SpiceCollectionScript.setFirstWiringSelected(gameObject);
             }
         }
@@ -92,8 +90,12 @@ public class NodeScript : MonoBehaviour {
         valueText.text = textToChange;
     }
 
-    public void mergeNet(GameObject ob)
+    public bool mergeNet(GameObject ob)
     {
+        if (ob == gameObject || ob.transform.parent == transform.parent) {
+            return false;
+        }
+
         createWire(gameObject.transform.position, ob.transform.position, lineMaterial, this.transform);
 
         //same node for both gameobjects
@@ -115,6 +117,7 @@ public class NodeScript : MonoBehaviour {
         ob.GetComponentInChildren<NodeScript>().changeAttachedNodeID(newNode);
 
         SpiceCollectionScript.clearFirstWiringSelected();
+        return true;
     }
 
     public static LineRenderer createWire(Vector3 node1, Vector3 node2, Material mat, Transform parent)

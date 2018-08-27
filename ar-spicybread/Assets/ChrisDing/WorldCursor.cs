@@ -3,13 +3,31 @@
 public class WorldCursor : MonoBehaviour
 {
     private MeshRenderer meshRenderer;
+    private GameObject lastNode;
+    public GameObject SpiceCollection;
+    private TapToPlaceParent SpiceCollectionScript;
+
+    public GameObject LastNode
+    {
+        get
+        {
+            return lastNode;
+        }
+
+        set
+        {
+            lastNode = value;
+        }
+    }
 
     // Use this for initialization
     void Start()
     {
         // Grab the mesh renderer that's on the same object as this script.
-        meshRenderer = this.gameObject.GetComponentInChildren<MeshRenderer>();
+        meshRenderer = gameObject.GetComponentInChildren<MeshRenderer>();
         meshRenderer.enabled = true;
+        SpiceCollectionScript = SpiceCollection.GetComponentInChildren<TapToPlaceParent>();
+
     }
 
     // Update is called once per frame
@@ -34,6 +52,30 @@ public class WorldCursor : MonoBehaviour
 
             // Rotate the cursor to hug the surface of the hologram.
             this.transform.rotation = Quaternion.FromToRotation(Vector3.up, hitInfo.normal);
+
+            if (hitInfo.collider.gameObject.name.Contains("Node"))
+            {
+                if (SpiceCollectionScript.getWiring())
+                {
+                    if (SpiceCollectionScript.isFirstWiringSelected())
+                    {
+                        if (SpiceCollectionScript.getFirstWiringComponent() != null && SpiceCollectionScript.getFirstWiringComponent().transform.parent != gameObject.transform.parent)
+                        {
+                            if (SpiceCollectionScript.getFirstWiringComponent().GetComponentInChildren<NodeScript>().mergeNet(hitInfo.collider.gameObject))
+                            {
+                                foreach (Transform child in hitInfo.collider.gameObject.transform.parent)
+                                {
+                                    if (child.gameObject.name.Contains("Node") && child.gameObject != hitInfo.collider.gameObject)
+                                    {
+                                        SpiceCollectionScript.clearFirstWiringSelected();
+                                        SpiceCollectionScript.setFirstWiringSelected(child.gameObject);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
         else
         {
