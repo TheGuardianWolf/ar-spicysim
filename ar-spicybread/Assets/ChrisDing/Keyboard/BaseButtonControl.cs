@@ -97,4 +97,11 @@ public class BaseButtonControl : MonoBehaviour {
         this.transform.root.BroadcastMessage("baseValue", value);
         Destroy(this.gameObject);
     }
+
+    private void Update()
+    {
+        Vector3 targetPoint = new Vector3(Camera.main.transform.position.x, transform.position.y, Camera.main.transform.position.z) - transform.position;
+        Quaternion targetRotation = Quaternion.LookRotation(-targetPoint, Vector3.up);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 2.0f);
+    }
 }

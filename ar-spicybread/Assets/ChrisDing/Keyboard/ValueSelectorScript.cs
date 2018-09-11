@@ -29,7 +29,7 @@ public class ValueSelectorScript : MonoBehaviour {
     {
         if (SpiceCollectionScript.getValuePlacement())
         {
-            transform.Rotate(new Vector3(0, 0, 45) * Time.deltaTime);
+            transform.Rotate(new Vector3(0, 45, 0) * Time.deltaTime);
         }
     }
 }
