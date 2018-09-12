@@ -5,44 +5,57 @@ using SpiceSharp.Components;
 using SpiceSharp.Simulations;
 using SpiceSharp;
 using System;
+using Assets.VirtualComponent.Display;
+using System.Collections;
 
 public class SimulationScript : MonoBehaviour {
     Circuit ckt;
     Graph graph;
     DC dc;
+    private DisplayManager displayManager;
 
     // Use this for initialization
     void Start () {
         ckt = new Circuit();
         graph = this.gameObject.GetComponentInChildren<GraphManager>().getGraph();
+        displayManager = FindObjectOfType<DisplayManager>();
     }
 
     void onSimulate()
     {
-        AddComponents();
-        dc.OnExportSimulationData += (sender, args) =>
+        try
         {
-            for (int i = 0; i < graph.getSize(); i++)
+            AddComponents();
+            dc.OnExportSimulationData += (sender, args) =>
             {
-                foreach (Transform child in graph.Contents[i].Value.transform)
+                for (int i = 0; i < graph.getSize(); i++)
                 {
-                    if (child.gameObject.name.Contains("Node"))
+                    foreach (Transform child in graph.Contents[i].Value.transform)
                     {
-                        if (child.gameObject.GetComponentInChildren<NodeScript>().attachedNodeID != 0)
+                        if (child.gameObject.name.Contains("Node"))
                         {
-                            double voltageAtNode = args.GetVoltage(child.gameObject.GetComponentInChildren<NodeScript>().attachedNodeID.ToString());
-                            child.gameObject.GetComponentInChildren<NodeScript>().changeText(Math.Round(voltageAtNode, 2).ToString());
+                            if (child.gameObject.GetComponentInChildren<NodeScript>().attachedNodeID != 0)
+                            {
+                                double voltageAtNode = args.GetVoltage(child.gameObject.GetComponentInChildren<NodeScript>().attachedNodeID.ToString());
+                                child.gameObject.GetComponentInChildren<NodeScript>().changeText(Math.Round(voltageAtNode, 2).ToString());
+                            }
                         }
                     }
                 }
-            }
-        };
+            };
+        }
+        catch (NullReferenceException ne)
+        {
+            showErrorText();
+        }
+
         try
         {
             ckt.Validate();
         }
         catch (CircuitException ce)
         {
+            showErrorText();
         }
         finally
         {
@@ -105,5 +118,18 @@ public class SimulationScript : MonoBehaviour {
                 }
             }
         }
+    }
+
+    private void showErrorText() {
+        displayManager.HudTooltip.text = "Please Check circuit integrity";
+        displayManager.HudTooltip.color = Color.red;
+        StartCoroutine(ExecuteAfterTime(3.0f));
+    }
+
+    IEnumerator ExecuteAfterTime(float time)
+    {
+        yield return new WaitForSeconds(time);
+
+        displayManager.HudTooltip.text = "";
     }
 }
