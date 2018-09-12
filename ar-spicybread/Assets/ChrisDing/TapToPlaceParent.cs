@@ -29,7 +29,7 @@ public class TapToPlaceParent : MonoBehaviour
         {
             // On each Select gesture, toggle whether the user is in placing mode.
             placing = false;
-            //SpatialMapping.Instance.DrawVisualMeshes = false;
+            SpatialMapping.Instance.DrawVisualMeshes = false;
             //this.cursor.SetActive(true);
         }
     }
@@ -174,7 +174,7 @@ public class TapToPlaceParent : MonoBehaviour
                 scaleIncrease = !scaleIncrease;
             }
 
-            if (scaleIncrease)
+            else if (scaleIncrease)
             {
                 firstWiringComponent.transform.localScale = new Vector3(firstWiringComponent.transform.localScale.x + firstWiringComponent.transform.localScale.x * scalingFactor * Time.deltaTime, firstWiringComponent.transform.localScale.y 
                     + firstWiringComponent.transform.localScale.y * scalingFactor * Time.deltaTime, firstWiringComponent.transform.localScale.z + firstWiringComponent.transform.localScale.z * scalingFactor * Time.deltaTime);

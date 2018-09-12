@@ -18,6 +18,7 @@ public class ResistorScript : MonoBehaviour {
     private Graph graph;
     private NodeManager nodes;
     private Text valueText;
+    private float timeSinceRotate;
     public Text text;
 
     public double VoltageValue
@@ -98,7 +99,11 @@ public class ResistorScript : MonoBehaviour {
     {
         if (Placing)
         {
-            this.gameObject.transform.RotateAround(gameObject.transform.position, transform.up, 90.0f);
+            if ((Time.time - timeSinceRotate) > 0.2f)
+            {
+                this.gameObject.transform.RotateAround(gameObject.transform.position, transform.up, 90.0f);
+                timeSinceRotate = Time.time;
+            }
         }
     }
 
@@ -190,6 +195,9 @@ public class ResistorScript : MonoBehaviour {
                 }
             }
             Destroy(gameObject);
+        }
+        else if (collision.gameObject.name.Contains("RotationSelector")) {
+            this.onRotate();
         }
     }
 }

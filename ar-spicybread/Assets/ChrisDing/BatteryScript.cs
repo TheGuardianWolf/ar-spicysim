@@ -11,6 +11,7 @@ public class BatteryScript : MonoBehaviour
     private bool selectingValue;
     private GameObject canvas;
     private int voltageValue;
+    private float timeSinceRotate;
     TapToPlaceParent SpiceCollectionScript;
     Graph graph;
     NodeManager nodes;
@@ -77,7 +78,11 @@ public class BatteryScript : MonoBehaviour
     {
         if (placing)
         {
-            this.gameObject.transform.RotateAround(this.gameObject.transform.position, transform.up, 90.0f);
+            if ((Time.time - timeSinceRotate) > 0.2f)
+            {
+                this.gameObject.transform.RotateAround(gameObject.transform.position, transform.up, 90.0f);
+                timeSinceRotate = Time.time;
+            }
         }
     }
 
@@ -138,6 +143,10 @@ public class BatteryScript : MonoBehaviour
                 }
             }
             Destroy(gameObject);
+        }
+        else if (collision.gameObject.name.Contains("RotationSelector"))
+        {
+            this.onRotate();
         }
     }
 }
