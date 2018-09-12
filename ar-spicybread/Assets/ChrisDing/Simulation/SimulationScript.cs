@@ -101,7 +101,8 @@ public class SimulationScript : MonoBehaviour {
 
                 foreach (Transform child in graph.Contents[i].Value.transform)
                 {
-                    if (child.gameObject.name == "LeftNode")
+                    Debug.Log(child.gameObject.name);
+                    if (child.gameObject.name.Contains("LeftNode"))
                     {
                         node1 = child.gameObject.GetComponentInChildren<NodeScript>().attachedNodeID.ToString();
                     }

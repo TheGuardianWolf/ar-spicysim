@@ -10,6 +10,7 @@ public class BatteryScript : MonoBehaviour
     private bool valuePlacing;
     private bool selectingValue;
     private GameObject canvas;
+    private Transform SpiceCollection;
     private int voltageValue;
     private float timeSinceRotate;
     TapToPlaceParent SpiceCollectionScript;
@@ -36,12 +37,13 @@ public class BatteryScript : MonoBehaviour
     {
         placing = true;
         selectingValue = false;
-        Transform SpiceCollection = this.transform.parent.transform;
+        SpiceCollection = this.transform.parent.transform;
         transform.rotation = SpiceCollection.rotation;
         SpiceCollectionScript = SpiceCollection.GetComponentInChildren<TapToPlaceParent>();
         SpiceCollectionScript.getPlacingMutex();
         graph = SpiceCollection.gameObject.GetComponentInChildren<GraphManager>().getGraph();
         nodes = SpiceCollection.gameObject.GetComponentInChildren<NodeManager>();
+        SpiceCollection.gameObject.GetComponentInChildren<WireComponentManager>().addComponent(gameObject);
 
         canvas = SpiceCollectionScript.canvas;
     }
@@ -54,6 +56,7 @@ public class BatteryScript : MonoBehaviour
             {
                 SpiceCollectionScript.returnPlacingMutex();
                 placing = false;
+                SpiceCollection.GetComponentInChildren<WireComponentManager>().moveWire(gameObject);
             }
             else if (SpiceCollectionScript.getPlacingMutex())
             {
@@ -101,6 +104,11 @@ public class BatteryScript : MonoBehaviour
                 this.transform.position = (hitInfo.point + (directionHead * 0.04f));
             }
         }
+
+        if (valueText != null)
+        {
+            valueText.rectTransform.SetPositionAndRotation(new Vector3(this.transform.position.x, this.transform.position.y + 0.08f, this.transform.position.z), Quaternion.LookRotation(Camera.main.transform.forward, Camera.main.transform.up));
+        }
     }
 
     public void changeText(string textToChange)
@@ -142,6 +150,8 @@ public class BatteryScript : MonoBehaviour
                     nodes.removeNode(child.gameObject);
                 }
             }
+            SpiceCollection.gameObject.GetComponentInChildren<WireComponentManager>().removeComponent(gameObject);
+            Destroy(valueText);
             Destroy(gameObject);
         }
         else if (collision.gameObject.name.Contains("RotationSelector"))

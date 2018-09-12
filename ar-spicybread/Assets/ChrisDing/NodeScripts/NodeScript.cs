@@ -96,7 +96,9 @@ public class NodeScript : MonoBehaviour {
             return false;
         }
 
-        createWire(gameObject.transform.position, ob.transform.position, lineMaterial, this.transform);
+        LineRenderer newLine = createWire(gameObject.transform.position, ob.transform.position, lineMaterial, this.transform);
+        SpiceCollection.GetComponentInChildren<WireComponentManager>().addWire(transform.parent.gameObject, newLine, this.gameObject, ob);
+        SpiceCollection.GetComponentInChildren<WireComponentManager>().addWire(ob.transform.parent.gameObject, newLine, ob, this.gameObject);
 
         //same node for both gameobjects
         int newNode = graph.getNewNodeID();
@@ -145,6 +147,7 @@ public class NodeScript : MonoBehaviour {
     {
         if (valueText != null)
         {
+           // valueText.text = attachedNodeID.ToString();
             valueText.rectTransform.SetPositionAndRotation(new Vector3(this.transform.position.x, this.transform.position.y + 0.08f, this.transform.position.z), Quaternion.LookRotation(Camera.main.transform.forward, Camera.main.transform.up));
         }
     }

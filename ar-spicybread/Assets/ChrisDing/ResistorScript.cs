@@ -13,6 +13,7 @@ public class ResistorScript : MonoBehaviour {
     private bool firstBase;
     private bool selectingValue;
     private GameObject canvas;
+    private Transform SpiceCollection;
     private double voltageValue;
     private TapToPlaceParent SpiceCollectionScript;
     private Graph graph;
@@ -54,17 +55,15 @@ public class ResistorScript : MonoBehaviour {
         firstBase = true;
         valuePlacing = false;
         selectingValue = false;
-        Transform SpiceCollection = this.transform.parent.transform;
+        SpiceCollection = this.transform.parent.transform;
         transform.rotation = SpiceCollection.rotation;
         SpiceCollectionScript = SpiceCollection.GetComponentInChildren<TapToPlaceParent>();
         Placing = true;
         graph = SpiceCollection.gameObject.GetComponentInChildren<GraphManager>().getGraph();
         nodes = SpiceCollection.gameObject.GetComponentInChildren<NodeManager>();
+        SpiceCollection.gameObject.GetComponentInChildren<WireComponentManager>().addComponent(gameObject);
 
         canvas = SpiceCollectionScript.canvas;
-
-        //Vector3 rightEnd = new Vector3((transform.position + 0.040f * transform.right).x - 0.005f, (transform.position + 0.040f * transform.right).y + 0.012f, (transform.position + 0.040f * transform.right).z + 0.001f);
-        //createWire(rightEnd, rightEnd + new Vector3(rightEnd.x + 0.02f, rightEnd.y, rightEnd.z), lineMaterial, this.transform);
     }
 
     private void OnSelect()
@@ -75,6 +74,7 @@ public class ResistorScript : MonoBehaviour {
             {
                 SpiceCollectionScript.returnPlacingMutex();
                 Placing = false;
+                SpiceCollection.GetComponentInChildren<WireComponentManager>().moveWire(gameObject);
             }
             else if (SpiceCollectionScript.getPlacingMutex())
             {
@@ -122,6 +122,11 @@ public class ResistorScript : MonoBehaviour {
                 var directionHead = (headPosition - hitInfo.point);
                 this.transform.position = (hitInfo.point + (directionHead * 0.04f));
             }
+        }
+
+        if (valueText != null)
+        {
+            valueText.rectTransform.SetPositionAndRotation(new Vector3(this.transform.position.x, this.transform.position.y + 0.08f, this.transform.position.z), Quaternion.LookRotation(Camera.main.transform.forward, Camera.main.transform.up));
         }
     }
 
@@ -194,6 +199,8 @@ public class ResistorScript : MonoBehaviour {
                     nodes.removeNode(child.gameObject);
                 }
             }
+            SpiceCollection.gameObject.GetComponentInChildren<WireComponentManager>().removeComponent(gameObject);
+            Destroy(valueText);
             Destroy(gameObject);
         }
         else if (collision.gameObject.name.Contains("RotationSelector")) {
