@@ -156,11 +156,11 @@ public class ResistorScript : MonoBehaviour {
         if (valuePlacing)
         {
             VoltageValue *= x;
-            if (VoltageValue / 1000000 > 1)
+            if (VoltageValue / 1000000 >= 1)
             {
                 changeText((VoltageValue / 1000000).ToString() + "M");
             }
-            else if (VoltageValue / 1000 > 1)
+            else if (VoltageValue / 1000 >= 1)
             {
                 changeText((VoltageValue / 1000).ToString() + "K");
             }
