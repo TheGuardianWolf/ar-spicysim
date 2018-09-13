@@ -110,7 +110,7 @@ public class AutoPlacement : MonoBehaviour {
             pair.Add(new ItemComponentPair(newResistor, item));
 
             //see if any components connected in series
-            List<ItemComponentPair> pairFoundSeries = pair.FindAll(o => o.Item.pos.x == (item.pos.x - 4));
+            List<ItemComponentPair> pairFoundSeries = pair.FindAll(o => o.Item.pos.x == (item.pos.x - 6));
             if (pairFoundSeries.Count > 0)
             {
                 ItemComponentPair closestComponent = pair.Find(i => i.Item.pos.y == pairFoundSeries.Max(o => o.Item.pos.y));
@@ -141,9 +141,9 @@ public class AutoPlacement : MonoBehaviour {
         GetComponentInChildren<TapToPlaceParent>().returnPlacingMutex();
         if (!sameAsLast)
         {
-            if (distanceFromBefore < 4)
+            if (distanceFromBefore < 6)
             {
-                resistor.transform.localPosition = new Vector3(/*distanceFromBefore * 0.05f + */(index - numSame) * 0.45f - ((sortedComponents.Count() * 0.9f) / 2) - distanceFromBefore * (0.45f / 4), 0.04f, 0.2f * item.pos.y - 1);
+                resistor.transform.localPosition = new Vector3(/*distanceFromBefore * 0.05f + */(index - numSame) * 0.45f - ((sortedComponents.Count() * 0.9f) / 2) - distanceFromBefore * (0.45f / 6), 0.04f, 0.2f * item.pos.y - 1);
             }
             else
             {

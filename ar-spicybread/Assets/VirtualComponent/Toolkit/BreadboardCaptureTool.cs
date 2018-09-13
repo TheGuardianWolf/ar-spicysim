@@ -71,6 +71,14 @@ public class BreadboardCaptureTool : ComponentTool
             new int[2] { 2, 5 }, 11
         );
 
+        breadboardScannerML = new BreadboardScannerML(
+            new int[4] { 0, 1, 2, 3 },
+            "",
+            new int[2] { 63, 10 },
+            new int[2] { 660, 220 },
+            new int[2] { 2, 5 }, 11
+        );
+
         //Fetch a pointer to Unity's spatial coordinate system if you need pixel mapping
         spatialCoordinateSystemPtr = UnityEngine.XR.WSA.WorldManager.GetNativeISpatialCoordinateSystemPtr();
 
@@ -140,7 +148,12 @@ public class BreadboardCaptureTool : ComponentTool
                 breadboardScanner.RunScanner(lastDetectionBytes, _resolution.width, _resolution.height);
                 breadboardScanner.GetList(breadboardItemList);
                 scannerState = ScannerState.DONE;
+
                 scannerStatus.text = "Tap to place generated circuit";
+                breadboardItemList.ForEach((Item item) =>
+                {
+                    scannerStatus.text += $"\nx: {item.pos.x.ToString()}, y: {item.pos.y.ToString()}";
+                });
             }
             else
             {
