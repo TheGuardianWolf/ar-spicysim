@@ -1,20 +1,20 @@
-﻿////  
-//// Copyright (c) 2017 Vulcan, Inc. All rights reserved.  
-//// Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
-////
+﻿//  
+// Copyright (c) 2017 Vulcan, Inc. All rights reserved.  
+// Licensed under the Apache 2.0 license. See LICENSE file in the project root for full license information.
+//
 
-//using UnityEngine;
+using UnityEngine;
 
 
-//using System;
+using System;
 
-//using HoloLensCameraStream;
-//using System.Threading.Tasks;
-//using System.Collections.Generic;
-//using Breadboard;
-//using Breadboard.AI;
-//using VirtualComponent;
-//using Assets.VirtualComponent.Display;
+using HoloLensCameraStream;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Breadboard;
+using Breadboard.AI;
+using VirtualComponent;
+using Assets.VirtualComponent.Display;
 
 //#if WINDOWS_UWP
 //using System.Runtime.InteropServices.WindowsRuntime;
@@ -24,216 +24,225 @@
 //using Windows.Media;
 //#endif
 
-///// <summary>
-///// This example gets the video frames at 30 fps and displays them on a Unity texture,
-///// which is locked the User's gaze.
-///// </summary>
-//public class BreadboardCaptureTool : ComponentTool
-//{
-//    private readonly string ML_MODEL_PATH = "ms-appx:///Data/StreamingAssets/resistor_classifier.onnx";
+/// <summary>
+/// This example gets the video frames at 30 fps and displays them on a Unity texture,
+/// which is locked the User's gaze.
+/// </summary>
+public class BreadboardCaptureTool : ComponentTool
+{
+    private readonly string ML_MODEL_PATH = "ms-appx:///Data/StreamingAssets/resistor_classifier.onnx";
 
-//    private DebugServer debugServer;
-//    private ComponentToolkit componentToolkit;
-//    private DisplayManager displayManager;
-//    public TextMesh scannerStatus;
+    private DebugServer debugServer;
+    private ComponentToolkit componentToolkit;
+    private DisplayManager displayManager;
+    private AutoPlacement autoPlacement;
+    public TextMesh scannerStatus;
 
-//    private HoloLensCameraStream.Resolution _resolution;
-//    private VideoCapture videoCapture;
-//    private IntPtr spatialCoordinateSystemPtr;
-//    private BreadboardScannerML breadboardScannerML;
-    
-//    private byte[] lastDetectionBytes;
-//    private int frameNumber = 0;
-//    private List<Item> breadboardItemList = new List<Item>();
-//    private ScannerState scannerState = ScannerState.IDLE;
+    private HoloLensCameraStream.Resolution _resolution;
+    private VideoCapture videoCapture;
+    private IntPtr spatialCoordinateSystemPtr;
+    private BreadboardScanner breadboardScanner;
+    private BreadboardScannerML breadboardScannerML;
 
-//    private enum ScannerState
-//    {
-//        IDLE,
-//        BUSY,
-//        DONE
-//    }
+    private byte[] lastDetectionBytes;
+    private int frameNumber = 0;
+    private List<Item> breadboardItemList = new List<Item>();
+    private ScannerState scannerState = ScannerState.IDLE;
 
-//    void Start()
-//    {
-//        debugServer = FindObjectOfType<DebugServer>();
-//        componentToolkit = FindObjectOfType<ComponentToolkit>();
-//        displayManager = FindObjectOfType<DisplayManager>();
+    private enum ScannerState
+    {
+        IDLE,
+        BUSY,
+        DONE
+    }
 
-//        breadboardScannerML = new BreadboardScannerML(
-//            new int[4] { 0, 1, 2, 3 },
-//            "",
-//            new int[2] { 63, 10 },
-//            new int[2] { 660, 220 },
-//            new int[2] { 2, 5 }, 11
-//        );
+    void Start()
+    {
+        debugServer = FindObjectOfType<DebugServer>();
+        componentToolkit = FindObjectOfType<ComponentToolkit>();
+        displayManager = FindObjectOfType<DisplayManager>();
+        autoPlacement = FindObjectOfType<AutoPlacement>();
 
-//        //Fetch a pointer to Unity's spatial coordinate system if you need pixel mapping
-//        spatialCoordinateSystemPtr = UnityEngine.XR.WSA.WorldManager.GetNativeISpatialCoordinateSystemPtr();
+        breadboardScanner = new BreadboardScanner(
+            new int[4] { 0, 1, 2, 3 },
+            "",
+            new int[2] { 63, 10 },
+            new int[2] { 660, 220 },
+            new int[2] { 2, 5 }, 11
+        );
 
-//        scannerStatus.text = "Tool is initialising";
+        //Fetch a pointer to Unity's spatial coordinate system if you need pixel mapping
+        spatialCoordinateSystemPtr = UnityEngine.XR.WSA.WorldManager.GetNativeISpatialCoordinateSystemPtr();
 
-//#if WINDOWS_UWP
-//        Task.Run(async () =>
-//        {
-//            var mlFile = await StorageFile.GetFileFromApplicationUriAsync(new Uri(ML_MODEL_PATH));
-//            IModel mlModel = await Breadboard.AI.ResistorClassifier.ResistorClassifierModel.CreateResistorClassifierModel(mlFile);
-//            breadboardScannerML.SetMLModel(mlModel);
+        scannerStatus.text = "Tool is initialising";
 
-//            UnityEngine.WSA.Application.InvokeOnAppThread(() =>
-//            {
-//                scannerStatus.text = "Tool is idle";
-//            }, false);
-//        }).Wait();       
-//#endif      
-//    }
+#if WINDOWS_UWP
+        //Task.Run(async () =>
+        //{
+        //    var mlFile = await StorageFile.GetFileFromApplicationUriAsync(new Uri(ML_MODEL_PATH));
+        //    IModel mlModel = await Breadboard.AI.ResistorClassifier.ResistorClassifierModel.CreateResistorClassifierModel(mlFile);
+        //    breadboardScannerML.SetMLModel(mlModel);
 
-//    override public void ComponentToolSelect()
-//    {
-//        if (scannerState == ScannerState.IDLE && componentToolkit.ActiveTool != this)
-//        {
-//            scannerState = ScannerState.BUSY;
-//            componentToolkit.ActiveTool = this;
-//            scannerStatus.text = "Tool is busy";
-            
-//            // Disable the 3D UI here
-//            displayManager.HudTooltip.text = "Place breadboard in view or tap to exit";
-//            displayManager.HudTooltip.color = new Color(255, 255, 255);
-//            CameraStreamHelper.Instance.GetVideoCaptureAsync(OnVideoCaptureCreated);
-//        }
-//        else if (scannerState == ScannerState.DONE && componentToolkit.ActiveTool != this)
-//        {
-//            componentToolkit.ActiveTool = this;
-//            // Change cursor to circuit model
-//        }
-//    }
+            UnityEngine.WSA.Application.InvokeOnAppThread(() =>
+            {
+                scannerStatus.text = "Tool is idle";
+            }, false);
+        //}).Wait();
+#endif
+    }
 
-//    override public void ComponentToolPlace()
-//    {
-//        componentToolkit.ActiveTool = null;
-//        if (scannerState == ScannerState.BUSY)
-//        {
-//            StopFrameCapture();
+    override public void ComponentToolSelect()
+    {
+        if (scannerState == ScannerState.IDLE && componentToolkit.ActiveTool != this)
+        {
+            scannerState = ScannerState.BUSY;
+            componentToolkit.ActiveTool = this;
+            scannerStatus.text = "Tool is busy";
 
-//            UnityEngine.WSA.Application.InvokeOnAppThread(() =>
-//            {
-//                displayManager.HudTooltip.text = "";
-//                displayManager.HudTooltip.color = Color.white;
-//            }, false);
+            // Disable the 3D UI here
+            displayManager.HudTooltip.text = "Place breadboard in view or tap to exit";
+            displayManager.HudTooltip.color = new Color(255, 255, 255);
+            CameraStreamHelper.Instance.GetVideoCaptureAsync(OnVideoCaptureCreated);
+        }
+        else if (scannerState == ScannerState.DONE && componentToolkit.ActiveTool != this)
+        {
+            componentToolkit.ActiveTool = this;
+            // Change cursor to circuit model
+        }
+    }
 
-//            if (lastDetectionBytes != null)
-//            {
-//                Task.Run(async () =>
-//                {
-//                    await breadboardScannerML.RunScannerAsync(lastDetectionBytes, _resolution.width, _resolution.height);
-//                    breadboardScannerML.GetList(breadboardItemList);
-//                    scannerState = ScannerState.DONE;
-//                    scannerStatus.text = "Tap to place generated circuit";
+    override public void ComponentToolPlace()
+    {
+        componentToolkit.ActiveTool = null;
+        if (scannerState == ScannerState.BUSY)
+        {
+            StopFrameCapture();
 
-//                    // Generate the circuit object
-//                    this.transform.parent.GetComponentInChildren<AutoPlacement>().RealComponents = breadboardItemList;
-//                    this.transform.parent.GetComponentInChildren<AutoPlacement>().onGenerate();
-//                });
-//            }
-//            else
-//            {
-//                scannerState = ScannerState.IDLE;
-//                scannerStatus.text = "Tool is idle";
-//            }
-//        }
-//        else if (scannerState == ScannerState.DONE)
-//        {
-//            // Place the circuit object
+            UnityEngine.WSA.Application.InvokeOnAppThread(() =>
+            {
+                displayManager.HudTooltip.text = "";
+                displayManager.HudTooltip.color = Color.white;
+            }, false);
 
-//            scannerState = ScannerState.IDLE;
-//            scannerStatus.text = "Tool is idle";
-//            lastDetectionBytes = null;
-//            breadboardItemList.Clear();
-//        }
+            if (lastDetectionBytes != null)
+            {
+                //Task.Run(async () =>
+                //{
+                //    await breadboardScannerML.RunScannerAsync(lastDetectionBytes, _resolution.width, _resolution.height);
+                //    breadboardScannerML.GetList(breadboardItemList);
+                //    scannerState = ScannerState.DONE;
+                //    scannerStatus.text = "Tap to place generated circuit";
 
-//    }
+                //    // Generate the circuit object
+                //    this.transform.parent.GetComponentInChildren<AutoPlacement>().RealComponents = breadboardItemList;
+                //    this.transform.parent.GetComponentInChildren<AutoPlacement>().onGenerate();
+                //});
+                breadboardScanner.RunScanner(lastDetectionBytes, _resolution.width, _resolution.height);
+                breadboardScanner.GetList(breadboardItemList);
+                scannerState = ScannerState.DONE;
+                scannerStatus.text = "Tap to place generated circuit";
+            }
+            else
+            {
+                scannerState = ScannerState.IDLE;
+                scannerStatus.text = "Tool is idle";
+            }
+        }
+        else if (scannerState == ScannerState.DONE)
+        {
+            // Place the circuit object
+            autoPlacement.RealComponents = breadboardItemList;
+            autoPlacement.onGenerate();
 
-//    private void StopFrameCapture()
-//    {
-//        if (videoCapture != null)
-//        {
-//            videoCapture.FrameSampleAcquired -= OnFrameSampleAcquired;
-//            videoCapture.StopVideoModeAsync((VideoCaptureResult result) => { });
-//        }
-//    }
+            scannerState = ScannerState.IDLE;
+            scannerStatus.text = "Tool is idle";
+            lastDetectionBytes = null;
+            breadboardItemList.Clear();
+        }
 
-//    private void OnDestroy()
-//    {
-//        StopFrameCapture();
-//    }
+    }
 
-//    private void OnVideoCaptureCreated(VideoCapture videoCapture)
-//    {
-//        if (videoCapture == null)
-//        {
-//            Debug.LogError("Did not find a video capture object. You may not be using the HoloLens.");
-//            return;
-//        }
+    private void StopFrameCapture()
+    {
+        if (videoCapture != null)
+        {
+            videoCapture.FrameSampleAcquired -= OnFrameSampleAcquired;
+            videoCapture.StopVideoModeAsync((VideoCaptureResult result) => { });
+        }
+    }
 
-//        this.videoCapture = videoCapture;
+    private void OnDestroy()
+    {
+        StopFrameCapture();
+    }
 
-//        //Request the spatial coordinate ptr if you want fetch the camera and set it if you need to 
-//        CameraStreamHelper.Instance.SetNativeISpatialCoordinateSystemPtr(spatialCoordinateSystemPtr);
+    private void OnVideoCaptureCreated(VideoCapture videoCapture)
+    {
+        if (videoCapture == null)
+        {
+            Debug.LogError("Did not find a video capture object. You may not be using the HoloLens.");
+            return;
+        }
 
-//        _resolution = new HoloLensCameraStream.Resolution(1408, 792);
-//        float frameRate = 20;
-//        videoCapture.FrameSampleAcquired += OnFrameSampleAcquired;
+        this.videoCapture = videoCapture;
 
-//        //You don't need to set all of these params.
-//        //I'm just adding them to show you that they exist.
-//        CameraParameters cameraParams = new CameraParameters();
-//        cameraParams.cameraResolutionHeight = _resolution.height;
-//        cameraParams.cameraResolutionWidth = _resolution.width;
-//        cameraParams.frameRate = Mathf.RoundToInt(frameRate);
-//        cameraParams.pixelFormat = CapturePixelFormat.BGRA32;
-//        cameraParams.rotateImage180Degrees = false; //If your image is upside down, remove this line.
-//        cameraParams.enableHolograms = false;
+        //Request the spatial coordinate ptr if you want fetch the camera and set it if you need to 
+        CameraStreamHelper.Instance.SetNativeISpatialCoordinateSystemPtr(spatialCoordinateSystemPtr);
 
-//        videoCapture.StartVideoModeAsync(cameraParams, OnVideoModeStarted);
-//    }
+        _resolution = new HoloLensCameraStream.Resolution(1408, 792);
+        float frameRate = 20;
+        videoCapture.FrameSampleAcquired += OnFrameSampleAcquired;
 
-//    private void OnVideoModeStarted(VideoCaptureResult result)
-//    {
-//        if (result.success == false)
-//        {
-//            Debug.LogWarning("Could not start video mode.");
-//            return;
-//        }
+        //You don't need to set all of these params.
+        //I'm just adding them to show you that they exist.
+        CameraParameters cameraParams = new CameraParameters();
+        cameraParams.cameraResolutionHeight = _resolution.height;
+        cameraParams.cameraResolutionWidth = _resolution.width;
+        cameraParams.frameRate = Mathf.RoundToInt(frameRate);
+        cameraParams.pixelFormat = CapturePixelFormat.BGRA32;
+        cameraParams.rotateImage180Degrees = false; //If your image is upside down, remove this line.
+        cameraParams.enableHolograms = false;
 
-//        Debug.Log("Video capture started.");
-//    }
+        videoCapture.StartVideoModeAsync(cameraParams, OnVideoModeStarted);
+    }
 
-//    private void OnFrameSampleAcquired(VideoCaptureSample sample)
-//    {        
-//        // Limit Frames used to one per 20
-//        if (frameNumber % 20 == 0)
-//        {
-//            var latestImageBytes = new byte[sample.dataLength];
+    private void OnVideoModeStarted(VideoCaptureResult result)
+    {
+        if (result.success == false)
+        {
+            Debug.LogWarning("Could not start video mode.");
+            return;
+        }
 
-//            sample.CopyRawImageDataIntoBuffer(latestImageBytes);
+        Debug.Log("Video capture started.");
+    }
 
-//            var hasBreadboard = breadboardScannerML.HasBreadboard(latestImageBytes, _resolution.width, _resolution.height);
+    private void OnFrameSampleAcquired(VideoCaptureSample sample)
+    {
+        // Limit Frames used to one per 20
+        if (frameNumber % 20 == 0)
+        {
+            var latestImageBytes = new byte[sample.dataLength];
 
-//            if (hasBreadboard)
-//            {
-//                if (lastDetectionBytes == null)
-//                {
-//                    UnityEngine.WSA.Application.InvokeOnAppThread(() =>
-//                    {
-//                        displayManager.HudTooltip.text = "Breadboard captured, tap to exit or continue to refresh";
-//                        displayManager.HudTooltip.color = Color.green;
-//                    }, false);
-//                }
-//                lastDetectionBytes = latestImageBytes;
-//            }
-//        }
+            sample.CopyRawImageDataIntoBuffer(latestImageBytes);
 
-//        sample.Dispose();
-//        frameNumber++;
-//    }
-//}
+            var hasBreadboard = breadboardScannerML.HasBreadboard(latestImageBytes, _resolution.width, _resolution.height);
+
+            if (hasBreadboard)
+            {
+                if (lastDetectionBytes == null)
+                {
+                    UnityEngine.WSA.Application.InvokeOnAppThread(() =>
+                    {
+                        displayManager.HudTooltip.text = "Breadboard captured, tap to exit or continue to refresh";
+                        displayManager.HudTooltip.color = Color.green;
+                    }, false);
+                }
+                lastDetectionBytes = latestImageBytes;
+            }
+        }
+
+        sample.Dispose();
+        frameNumber++;
+    }
+}
