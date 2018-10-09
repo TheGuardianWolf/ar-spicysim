@@ -41,9 +41,4 @@ public class GraphManager : MonoBehaviour {
         return temp;
 
     }
-
-    // Update is called once per frame
-    void Update () {
-		
-	}
 }
